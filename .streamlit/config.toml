@@ -1,0 +1,47 @@
+# Fichier config.toml pour Streamlit
+
+# Customize the colors and style of your application's interface
+[theme]
+# Primary application color
+primaryColor = '#1f77b4'
+backgroundColor = 'white'
+# Secondary background color (maps, recessed elements, etc.)
+secondaryBackgroundColor = '#f0f2f6'
+textColor = '#000000'
+# Font used in application (options: 'sans serif', 'serif', 'monospace')
+font = 'sans serif'
+
+# Streamlit server configuration
+[server]
+# If true, Streamlit runs in non-interface mode
+headless = true
+# If false, disables CORS protection
+enableCORS = false
+# The port on which Streamlit will run
+port = 8501
+# Enables websockets compression for better network performance
+enableWebsocketCompression = true
+
+# Browser options
+[browser]
+# If false, disables the collection of usage statistics by Streamlit
+gatherUsageStats = false
+
+[layout]
+wide = true
+
+[mapbox]
+token = "your_mapbox_token_here"
+
+# Configuration for running Streamlit scripts
+[runner]
+# Enables or disables Streamlit magic
+magicEnabled = true
+# Enables or disables code tracer
+installTracer = false
+
+# Options for configuring logging
+[logger]
+level = 'info'
+format = '%(asctime)s - %(message)s'
+messageFormat = '%(message)s'
