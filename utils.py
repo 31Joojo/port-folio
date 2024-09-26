@@ -151,7 +151,7 @@ def count_data(df: pd.DataFrame, columns_to_count, sort_type: str) -> pd.Series:
         raise ValueError("Invalid sort_by value. Use 'index' or 'values'.")
 
 ### Function to group data
-def group_data(df: pd.DataFrame, columns_to_group: list, column_referred: str, agg_func: str = 'sum') -> pd.DataFrame:
+def group_data(df: pd.DataFrame, columns_to_group: list, column_referred: str = None, agg_func: str = 'sum') -> pd.DataFrame:
     """
     Function to group the data according to specified columns and apply an aggregation function
 
