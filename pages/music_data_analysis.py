@@ -57,6 +57,9 @@ def app():
     st.write("""
     We can see that the general trend is for me to let pieces finish naturally before they change :
     this represents 91.1% of total pieces over the years 2023 and 2024.
+    Now, not taking into account the percentage of tracks I listen to that end on their own, about half the tracks
+    I've listened to have ended because I skipped them.
+    So basically, when I listen to my music, it either ends on its own, or I skip to something else.
     """)
 
     ### Musical activity according to the month
