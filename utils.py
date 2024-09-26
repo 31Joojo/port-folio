@@ -1,8 +1,8 @@
 import pandas as pd
 
 ### Function to load the data
-def load_data(filepath):
-    return pd.read_csv(filepath)
+def load_data(filepath, delimiter: str = None):
+    return pd.read_csv(filepath, delimiter=delimiter)
 
 ### Function to drop columns
 def drop_columns(df: pd.DataFrame, columns_to_drop: list) -> pd.DataFrame:
