@@ -18,7 +18,7 @@ def app():
              """)
     
     ### Data cleaning
-    music_play_daily = load_data('/Users/Jorislarmaillard/Documents/Semestre_7/Informatique/Data_Visualization/portfolio_project/data/Apple Music - Play History Daily Tracks copie.csv')
+    music_play_daily = load_data('data/Apple Music - Play History Daily Tracks copie.csv')
 
     new_column_info: dict = {
         'Play Duration Seconds': (convert_data, 'Play Duration Milliseconds'),
