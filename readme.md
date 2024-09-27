@@ -9,6 +9,8 @@ This repository contains two main sections:
 
 Each part showcases different aspects of data analysis and visualization, allowing me to demonstrate my skills in data wrangling, cleaning, and visual exploration.
 
+### [Link to my portfolio](https://port-folio-joris-larmaillard-noiren.streamlit.app)
+
 ---
 
 ## Part 1: My Music Listening Habits
