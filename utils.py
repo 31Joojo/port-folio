@@ -4,6 +4,17 @@ import pandas as pd
 def load_data(filepath, delimiter: str = None):
     return pd.read_csv(filepath, delimiter=delimiter)
 
+### Function to select columns from a DataFrame
+def select_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+    """
+    Selects columns from a dataframe
+
+    :param df: The DataFrame to select columns from
+    :param columns: List of columns to select
+    :return: DataFrame with selected columns
+    """
+    return df[columns]
+
 ### Function to drop columns
 def drop_columns(df: pd.DataFrame, columns_to_drop: list) -> pd.DataFrame:
     """
@@ -151,7 +162,8 @@ def count_data(df: pd.DataFrame, columns_to_count, sort_type: str) -> pd.Series:
         raise ValueError("Invalid sort_by value. Use 'index' or 'values'.")
 
 ### Function to group data
-def group_data(df: pd.DataFrame, columns_to_group: list, column_referred: str = None, agg_func: str = 'sum') -> pd.DataFrame:
+def group_data(df: pd.DataFrame, columns_to_group: list,
+               column_referred: str = None, agg_func: str = 'sum', name: str = None) -> pd.DataFrame:
     """
     Function to group the data according to specified columns and apply an aggregation function
 
@@ -159,17 +171,75 @@ def group_data(df: pd.DataFrame, columns_to_group: list, column_referred: str = 
     :param columns_to_group: The columns that will be used to group the data
     :param column_referred: The column on which to apply the aggregation function
     :param agg_func: The aggregation function to apply ('sum', 'mean', 'count', etc.)
+    :param name: The name of the group
     :return: A DataFrame with grouped columns and aggregated results
     """
-    # Perform the groupby operation
+    ### Perform the groupby operation
     grouped = df.groupby(columns_to_group)[column_referred]
 
-    # Apply the aggregation function
+    ### Apply the aggregation function
     if agg_func == 'sum':
-        return grouped.sum().reset_index()
+        return grouped.sum().reset_index(name=name)
     elif agg_func == 'mean':
-        return grouped.mean().reset_index()
+        return grouped.mean().reset_index(name=name)
     elif agg_func == 'count':
         return grouped.count().reset_index()
+    elif agg_func == 'size':
+        return grouped.size().reset_index(name=name)
     else:
         raise ValueError("Invalid agg_func. Use 'sum', 'mean', 'count', or other valid pandas aggregation functions.")
+
+### Function to melt a transformed DataFrame
+def melt_dataframe(df: pd.DataFrame, columns_to_save: list,
+                   columns_to_melt: list, var_name: str, value_name: str) -> pd.DataFrame:
+    """
+    Function to melt the data according to the specified columns
+
+    :param df: The DataFrame to work on
+    :param columns_to_save: Columns that won't change
+    :param columns_to_melt: The columns that will be melted
+    :param var_name: New column melted name
+    :param value_name: New name for the column that contains the values
+    :return: New melted DataFrame
+    """
+    df_melted = pd.melt(df, id_vars=columns_to_save, value_vars=columns_to_melt,
+                        var_name=var_name, value_name=value_name)
+    return df_melted
+
+### Function for transforming values into dummies
+def transform_into_dummies(df: pd.DataFrame, ref_column: str, seperator: str = None) -> pd.DataFrame:
+    """
+    Function to transform data into dummy variables
+
+    :param df: The DataFrame to work on
+    :param ref_column: The column on which to apply the aggregation function
+    :param seperator: Separator to use
+    :return: New DataFrame with dummy variables
+    """
+    return df[ref_column].str.get_dummies(seperator=seperator)
+
+### Function to merge two DataFrames
+import pandas as pd
+
+def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner', *args, **kwargs):
+    """
+    Function for merging several DataFrames based on specified columns
+
+
+    :param df1: First DataFrame
+    :param df2: Second DataFrame
+    :param on: The columns or index on which to merge the DataFrames
+    :param how: Merge type ('inner', 'outer', 'left', 'right'), default 'inner'
+    :param *args: Additional DataFrames to merge
+    :param **kwargs: Other optional arguments to pass to pd.merge()
+    :return: Resulting merged DataFrame
+    """
+    ### Merge df1 and df2 first
+    df_merged = pd.merge(df1, df2, on=on, how=how, **kwargs)
+
+    ### Merge additional DataFrames passed in *args
+    for df in args:
+        df_merged = pd.merge(df_merged, df, on=on, how=how, **kwargs)
+
+    return df_merged
+
