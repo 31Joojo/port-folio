@@ -19,9 +19,71 @@ def app():
             The aim is to provide a clear and accessible view of the current situation of the fuel market in France.
     """)
 
-    ### Data cleaning
-    df = load_data('data/prix-des-carburants-en-france-flux-instantane-v2.csv', delimiter=';')
+    ### CSS for the gear animation
+    st.markdown(
+        """
+        <style>
+        .gear-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+        }
 
-    df = clean_data(df,
-                    columns_to_drop=['horaires', 'horaires_automate_24_24',
-                                     'horaires_jour', 'services', 'services_service'])
+        .gear {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #6c757d;
+            position: relative;
+            animation: spin 2s linear infinite;
+        }
+
+        .gear:before, .gear:after {
+            content: "";
+            position: absolute;
+            background: #6c757d;
+            border-radius: 50%;
+        }
+
+        .gear:before {
+            width: 25%;
+            height: 25%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .gear:after {
+            width: 15%;
+            height: 15%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .under-construction-text {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #6c757d;
+        }
+        </style>
+        """, unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        <div class="gear-container">
+            <div class="gear"></div>
+            <div class="under-construction-text">This section is under construction.</div>
+        </div>
+        """, unsafe_allow_html=True
+    )
+
