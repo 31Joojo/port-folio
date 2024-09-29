@@ -15,8 +15,6 @@ font = 'sans serif'
 [server]
 # If true, Streamlit runs in non-interface mode
 headless = true
-# If false, disables CORS protection
-enableCORS = false
 # The port on which Streamlit will run
 port = 8501
 # Enables websockets compression for better network performance
@@ -45,3 +43,7 @@ installTracer = false
 level = 'info'
 format = '%(asctime)s - %(message)s'
 messageFormat = '%(message)s'
+
+# Removing default sidebar
+[ui]
+hideSidebarNav = true
