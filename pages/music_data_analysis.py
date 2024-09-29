@@ -116,7 +116,6 @@ def app():
     ert_day_duration = group_data(music_play_daily, ['End Reason Type', 'Date Played'],
                                   'Play Duration Seconds', 'sum')
 
-    fig = plt.figure(figsize=(20, 20))
     fig = px.scatter_3d(ert_day_duration,
                         x='Date Played',
                         y='End Reason Type',
@@ -124,6 +123,8 @@ def app():
                         title="Total listening duration by end reason type and by day",
                         color='End Reason Type',
                         labels={'Play Duration Seconds': 'Total Listening Duration (Seconds)'})
+
+    fig.update_layout(width=700, height=700)
 
     st.plotly_chart(fig)
 
