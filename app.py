@@ -10,7 +10,19 @@ from streamlit_option_menu import option_menu
 from pages import home_page, music_data_analysis, gov_data_analysis
 
 ### Setting the navigation bar
-st.set_page_config(page_title="My Portfolio", page_icon="📊", layout="wide")
+st.set_page_config(page_title="My Portfolio", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
+
+### Remove default sidebar
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 ### Navigation bar with the different pages
 selected = option_menu(
