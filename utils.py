@@ -179,7 +179,7 @@ def group_data(df: pd.DataFrame, columns_to_group: list,
 
     ### Apply the aggregation function
     if agg_func == 'sum':
-        return grouped.sum().reset_index(name=name)
+        return grouped.sum().reset_index()
     elif agg_func == 'mean':
         return grouped.mean().reset_index(name=name)
     elif agg_func == 'count':
@@ -219,7 +219,6 @@ def transform_into_dummies(df: pd.DataFrame, ref_column: str, seperator: str = N
     return df[ref_column].str.get_dummies(seperator=seperator)
 
 ### Function to merge two DataFrames
-import pandas as pd
 
 def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner', *args, **kwargs):
     """
