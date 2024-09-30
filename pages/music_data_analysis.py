@@ -79,6 +79,15 @@ def app():
     ### Musical activity according to the day
     st.subheader('Musical activity according to the day :', divider=True)
 
+    days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+    ### Convert the ‘Day Name’ column into an ordered category
+    music_play_daily['Day Name'] = pd.Categorical(
+        music_play_daily['Day Name'],
+        categories=days_order,
+        ordered=True
+    )
+
     day_activity = count_data(music_play_daily, ['Day Name', 'Year'], 'index')
 
     day_activity = day_activity.reset_index()
