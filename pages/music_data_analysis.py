@@ -124,7 +124,7 @@ def app():
                         color='End Reason Type',
                         labels={'Play Duration Seconds': 'Total Listening Duration (Seconds)'})
 
-    fig.update_layout(width=700, height=700)
+    fig.update_layout(height=800)
 
     st.plotly_chart(fig)
 
