@@ -193,5 +193,7 @@ def app():
 
     st.plotly_chart(fig)
 
-    st.write("""As we can see, there is no real correlation between the variables
-             `number of listenings` and `listening time`.""")
+    st.write("""
+        As we can see, there is no real correlation between the variables
+        `number of listening` and `listening time`.
+    """)
