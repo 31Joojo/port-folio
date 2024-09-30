@@ -37,7 +37,7 @@ def app():
                                   date_column='Date Played',
                                   date_format='%Y%m%d')
 
-    music_play_daily = filter_data(music_play_daily, "Year in (2020, 2021, 2022, 2023, 2024)")
+    music_play_daily = filter_data(music_play_daily, "Year in (2021, 2022, 2023, 2024)")
 
     st.write('Here is the dataframe.')
     st.dataframe(music_play_daily, height=600)
@@ -99,6 +99,24 @@ def app():
                   title='Musical activity according to the day')
 
     st.plotly_chart(fig)
+
+    st.write("""
+        From 2021 to 2023, there was an increase in my daily listening during the week: as we can see, from Monday to
+        Thursday I had a strong tendency to listen to music. This is mainly due to the fact that I have more time to
+        listen to music than I do now. The dip we see for Saturday is due to the fact that I generally listened to less
+        music on that day, and was more focused on working in the evening.
+        And of course, Sunday was usually a time for relaxation, so it was a good day for listening to music.
+        All the same, I'm quite surprised by these increasing numbers for 2022 and 2023, because during those years I
+        was in preparatory classes, and I really had the impression that I listened to less music than I did in high
+        school.
+        As far as 2024 is concerned, these figures are perhaps a little premature to consider, as the year is not yet
+        over, but over these first 8 months, the figures are fairly consistent with my activity.
+        Over the week as a whole I'm less inclined to listen to music this year, which for me is perfectly normal,
+        because I no longer have the opportunity for those little moments that used to allow me to listen to music,
+        whether it's to go to school or to do the shopping. Everything is close by, or I don't even think about it any
+        more, so subconsciously I no longer feel the need to listen to music when I'm doing something. However,
+        I listen to a lot more music on Saturdays than in previous years.
+    """)
 
     ### Most-listened-to artists
 
