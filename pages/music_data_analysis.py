@@ -110,7 +110,11 @@ def app():
 
     st.plotly_chart(fig)
 
-    st.write("Which is a fact, we can see that the artist I listen to most is BTS.")
+    st.write("""
+        Which is a fact, we can see that the artist I listen to most is BTS.
+        For the majority of artists whose listening figures are below 10, this is normal given that when I want to 
+        listen to music outside my library, I listen to it on other platforms such as Youtubeurs or SoundCloud.
+    """)
     st.markdown("**Most-listened-to artists depending on the day and the number of listening hours**")
 
     ert_day_duration = group_data(music_play_daily, ['End Reason Type', 'Date Played'],
