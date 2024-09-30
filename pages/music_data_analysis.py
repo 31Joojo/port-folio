@@ -12,10 +12,10 @@ def app():
 
     ### Introduction
     st.write("""
-            In this section, I'll examine and analyze my musical listening habits.
-             Using data collected over time, I'll explore my favorite artists, genres and tracks, as well as my listening trends.
-             This will help me identify my preferences and better understand how my music consumption is evolving.
-             """)
+        In this section, I'll examine and analyze my musical listening habits.
+        Using data collected over time, I'll explore my favorite artists, genres and tracks, as well as my listening trends.
+        This will help me identify my preferences and better understand how my music consumption is evolving.
+    """)
     
     ### Data cleaning
     music_play_daily = load_data('data/Apple Music - Play History Daily Tracks copie.csv')
@@ -55,11 +55,11 @@ def app():
     st.plotly_chart(fig)
 
     st.write("""
-    We can see that the general trend is for me to let pieces finish naturally before they change :
-    this represents 91.1% of total pieces over the years 2023 and 2024.
-    Now, not taking into account the percentage of tracks I listen to that end on their own, about half the tracks
-    I've listened to have ended because I skipped them.
-    So basically, when I listen to my music, it either ends on its own, or I skip to something else.
+        We can see that the general trend is for me to let pieces finish naturally before they change :
+        this represents 91.1% of total pieces over the years 2023 and 2024.
+        Now, not taking into account the percentage of tracks I listen to that end on their own, about half the tracks
+        I've listened to have ended because I skipped them.
+        So basically, when I listen to my music, it either ends on its own, or I skip to something else.
     """)
 
     ### Musical activity according to the month
@@ -173,10 +173,10 @@ def app():
     st.plotly_chart(fig)
 
     st.write("""
-    Surprisingly, I thought that the first music I listened to the most was, at first, in my main library,
-    and also would be K-Pop, but obviously not. That said, this data is spread over the last two years,
-    because I think the trend would reverse.
-    However, this may be due to the fact that I have a very particular way of listening to the music in my libraries.
+        Surprisingly, I thought that the first music I listened to the most was, at first, in my main library,
+        and also would be K-Pop, but obviously not. That said, this data is spread over the last two years,
+        because I think the trend would reverse.
+        However, this may be due to the fact that I have a very particular way of listening to the music in my libraries.
     """)
 
     st.subheader("Correlation between listening time and number of plays per song", divider=True)
