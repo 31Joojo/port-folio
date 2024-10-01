@@ -1,8 +1,25 @@
 import pandas as pd
+import json
 
 ### Function to load the data
-def load_data(filepath, delimiter: str = None):
+def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
+    """
+    Loads data from csv file
+    :param filepath: File path that will be loaded
+    :param delimiter: File parser
+    :return: A DataFrame with data loaded from the csv file
+    """
     return pd.read_csv(filepath, delimiter=delimiter)
+
+### Function to load a file
+def load_json(jsonfile: str) -> dict:
+    """
+    Loads data from json file
+    :param jsonfile: File path that will be loaded
+    :return: Json data loaded from the json file
+    """
+    with open(jsonfile, 'r') as f:
+        return json.load(f)
 
 ### Function to select columns from a DataFrame
 def select_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
@@ -242,3 +259,4 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner',
 
     return df_merged
 
+### Function
