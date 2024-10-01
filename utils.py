@@ -211,6 +211,18 @@ def group_data(df: pd.DataFrame, columns_to_group: list,
     else:
         raise ValueError("Invalid agg_func. Use 'sum', 'mean', 'count', or other valid pandas aggregation functions.")
 
+### Function to generate crosstab
+def cross_df(df: pd.DataFrame, col1: str, col2: str) -> pd.DataFrame:
+    """
+    Function to cross the data according to a specified column
+
+    :param df: The DataFrame to work on
+    :param col1: First column that will be crossed
+    :param col2: Second column that will be crossed
+    :return: A DataFrame with crossed columns
+    """
+    return df.cross(col1, col2)
+
 ### Function to melt a transformed DataFrame
 def melt_dataframe(df: pd.DataFrame, columns_to_save: list,
                    columns_to_melt: list, var_name: str, value_name: str) -> pd.DataFrame:
