@@ -221,7 +221,7 @@ def cross_df(df: pd.DataFrame, col1: str, col2: str) -> pd.DataFrame:
     :param col2: Second column that will be crossed
     :return: A DataFrame with crossed columns
     """
-    return df.cross(col1, col2)
+    return pd.crosstab(df[col1], df[col2])
 
 ### Function to melt a transformed DataFrame
 def melt_dataframe(df: pd.DataFrame, columns_to_save: list,
