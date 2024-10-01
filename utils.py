@@ -5,6 +5,7 @@ import json
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
     """
     Loads data from csv file
+
     :param filepath: File path that will be loaded
     :param delimiter: File parser
     :return: A DataFrame with data loaded from the csv file
@@ -15,6 +16,7 @@ def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
 def load_json(jsonfile: str) -> dict:
     """
     Loads data from json file
+
     :param jsonfile: File path that will be loaded
     :return: Json data loaded from the json file
     """
@@ -246,8 +248,6 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner',
     :param df2: Second DataFrame
     :param on: The columns or index on which to merge the DataFrames
     :param how: Merge type ('inner', 'outer', 'left', 'right'), default 'inner'
-    :param *args: Additional DataFrames to merge
-    :param **kwargs: Other optional arguments to pass to pd.merge()
     :return: Resulting merged DataFrame
     """
     ### Merge df1 and df2 first
@@ -259,4 +259,17 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner',
 
     return df_merged
 
-### Function
+### Function to concatenate DataFrame
+def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner') -> pd.DataFrame:
+    """
+    Function to concatenate several DataFrames based on specified columns
+
+    :param df1: First DataFrame to concatenate
+    :param df2: Seconde DataFrame to concatenate
+    :param on: Specific column on which to merge the DataFrames
+    :param how: Method to combine the DataFrames
+    :return: New DataFrame with concatenated DataFrames
+    """
+    df_concatenated = pd.concat(df1, df2, axis=1)
+
+    return df_concatenated
