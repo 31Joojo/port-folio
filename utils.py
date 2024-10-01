@@ -1,5 +1,8 @@
 import pandas as pd
 import json
+import plotly.express as px
+from matplotlib import pyplot as plt
+from plotly.subplots import make_subplots
 
 ### Function to load the data
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
@@ -260,16 +263,107 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner',
     return df_merged
 
 ### Function to concatenate DataFrame
-def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner') -> pd.DataFrame:
+def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     """
     Function to concatenate several DataFrames based on specified columns
 
     :param df1: First DataFrame to concatenate
     :param df2: Seconde DataFrame to concatenate
-    :param on: Specific column on which to merge the DataFrames
-    :param how: Method to combine the DataFrames
     :return: New DataFrame with concatenated DataFrames
     """
     df_concatenated = pd.concat(df1, df2, axis=1)
 
     return df_concatenated
+
+### Function to make a simple plot
+def simple_plot(df: pd.DataFrame, geojson_file: str = None, loc: str = None,
+                color: str = None, hover_infor: str = None, label: dict = None, title: str = None) -> None:
+    """
+    Function to plot a scatter plot of a DataFrame
+
+    :param df: The DataFrame to work on
+    :param geojson_file: Geojson from which location data are loaded
+    :param loc: Column to use as location
+    :param color: Column to use as color
+    :param hover_infor: Information to display while hovering
+    :param label: Corresponding label for the corresponding data
+    :param title: Title of the plot
+    """
+    fig = px.choropleth(
+        df,
+        geojson=geojson_file,
+        locations=loc,
+        featureidkey="properties.code",
+        color=color,
+        hover_name=hover_infor,
+        color_continuous_scale="Plasma",
+        labels=label,
+        title=title
+    )
+
+    fig.update_layout(fitbounds="locations", visible=False)
+
+    ### Final plot
+    fig.show()
+
+### Function to make subplots
+def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None,
+             loc: str = None, hover_infor: str = None, color1: str = None, color2: str = None,
+             label1: dict = None, label2: dict = None, title: str = None
+             ) -> None:
+    """
+    Function to display subplots on one plot
+
+    :param df: The DataFrame to work on
+    :param subtitles: Tuples of the two subtitles to display on the subplots
+    :param geojson_file: Geojson from which location data are loaded
+    :param loc: Column to use as location
+    :param hover_infor: Column to use as hover information
+    :param color1: First color
+    :param color2: Second color
+    :param label1: Label for first subplot
+    :param label2: Label for second subplot
+    :param title: Title of the final plot
+    """
+
+    ### Creating a figure with two columns
+    fig = make_subplots(rows=1, cols=2,
+                        subplot_titles=subtitles,
+                        specs=[[{"type": "choropleth"}, {"type": "choropleth"}]])
+
+    ### First column : 1
+    fig.add_trace(
+        px.choropleth(
+            geojson=geojson_file,
+            locations=loc,
+            featureidkey="properties.code",
+            color=color1,
+            hover_name=hover_infor,
+            color_continuous_scale="Plasma",
+            labels=label1
+        ).data[0],
+        row=1, col=1
+    )
+
+    ### Second column : 2
+    fig.add_trace(
+        px.choropleth(
+            df,
+            geojson=geojson_file,
+            locations=loc,
+            featureidkey="properties.code",
+            color=color2,
+            hover_name=hover_infor,
+            color_continuous_scale="Plasma",
+            labels=label2
+        ).data[0],
+        row=1, col=2
+    )
+
+    ### Setting appearance and geographical boundaries
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(title_text=title,
+                      height=800)
+
+    ### Displaying the final plot
+    fig.show()
