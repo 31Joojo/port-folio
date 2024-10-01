@@ -92,6 +92,14 @@ def app():
 
     day_activity = day_activity.reset_index()
 
+    day_activity_crossed = cross_df(music_play_daily, 'Day Name', 'Year')
+
+    st.dataframe(day_activity_crossed)
+
+    st.write("""
+        Here you can see a cross table with the data that will be studied in the next section.
+    """)
+
     fig = px.line(day_activity,
                   x='Day Name',
                   y='count',
@@ -158,6 +166,22 @@ def app():
     fig.update_layout(height=800)
 
     st.plotly_chart(fig)
+
+    st.write("""
+        On the X axis, we can see different periods from January 2022 to July 2024. The distribution of points on this
+        axis shows continuity in the listening, and the different colours of the points probably represent different
+        time periods.
+        On the Y axis, we see the total duration of listening in seconds, ranging from 0 to over 20,000 seconds
+        (around 5h30), which means that some tracks were listened to for long periods or played several times.
+        However, the vast majority of the data seems to be concentrated between 0 and 5,000 seconds, indicating
+        shorter listening periods.
+        On the Z axis, we can see the different types of reasons why a play ended. The distribution shows that some
+        types of ending are much more frequent than others, notably ‘NATURAL_END_OF_TRACK’, with the majority of points
+        appearing to be linked to natural listening (end of track with NATURAL_END_OF_TRACK) and long listening
+        (more than 5000 seconds).
+        Analysis on the X axis shows a certain variation in listening habits as a function of time.
+        There seem to be periods of more intense activity and quieter periods depending on the density of the points.
+    """)
 
     ### Most-listened-to artists
     st.subheader("Most-listened-to artists :", divider=True)
