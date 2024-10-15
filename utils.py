@@ -3,6 +3,7 @@ import json
 import plotly.express as px
 from matplotlib import pyplot as plt
 from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
 ### Function to load the data
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
@@ -204,6 +205,8 @@ def group_data(df: pd.DataFrame, columns_to_group: list,
         return grouped.sum().reset_index()
     elif agg_func == 'mean':
         return grouped.mean().reset_index(name=name)
+    elif agg_func == 'median':
+        return grouped.median().reset_index()
     elif agg_func == 'count':
         return grouped.count().reset_index()
     elif agg_func == 'size':
@@ -288,26 +291,28 @@ def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return df_concatenated
 
 ### Function to make a simple plot
-def simple_plot(df: pd.DataFrame, geojson_file: str = None, loc: str = None,
-                color: str = None, hover_infor: str = None, label: dict = None, title: str = None) -> None:
+def simple_plot(df: pd.DataFrame, path_geojson_file: str = None, loc: str = None,
+                color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> None:
     """
     Function to plot a scatter plot of a DataFrame
 
     :param df: The DataFrame to work on
-    :param geojson_file: Geojson from which location data are loaded
+    :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param color: Column to use as color
-    :param hover_infor: Information to display while hovering
+    :param hover_name: Name to display while hovering
+    :param hover_data: Data to display when hovering
     :param label: Corresponding label for the corresponding data
     :param title: Title of the plot
     """
     fig = px.choropleth(
         df,
-        geojson=geojson_file,
+        geojson=load_json(path_geojson_file),
         locations=loc,
         featureidkey="properties.code",
         color=color,
-        hover_name=hover_infor,
+        hover_name=hover_name,
+        hover_data=hover_data,
         color_continuous_scale="Plasma",
         labels=label,
         title=title
@@ -319,7 +324,7 @@ def simple_plot(df: pd.DataFrame, geojson_file: str = None, loc: str = None,
     fig.show()
 
 ### Function to make subplots
-def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None,
+def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
              loc: str = None, hover_infor: str = None, color1: str = None, color2: str = None,
              label1: dict = None, label2: dict = None, title: str = None
              ) -> None:
@@ -328,7 +333,7 @@ def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None
 
     :param df: The DataFrame to work on
     :param subtitles: Tuples of the two subtitles to display on the subplots
-    :param geojson_file: Geojson from which location data are loaded
+    :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param hover_infor: Column to use as hover information
     :param color1: First color
@@ -346,7 +351,7 @@ def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None
     ### First column : 1
     fig.add_trace(
         px.choropleth(
-            geojson=geojson_file,
+            geojson=load_json(path_geojson_file),
             locations=loc,
             featureidkey="properties.code",
             color=color1,
@@ -361,7 +366,7 @@ def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None
     fig.add_trace(
         px.choropleth(
             df,
-            geojson=geojson_file,
+            geojson=load_json(path_geojson_file),
             locations=loc,
             featureidkey="properties.code",
             color=color2,
@@ -378,4 +383,53 @@ def subplots(df: pd.DataFrame, subtitles: tuple = None, geojson_file: str = None
                       height=800)
 
     ### Displaying the final plot
+    fig.show()
+
+### Function to make a boxplot
+def make_boxplot(df: pd.DataFrame, list_columns: list, list_names: list,
+                 title: str = None, x_axis: str = None, y_axis: str = None) -> None:
+    """
+    Function to make a box plot of different features from a DataFrame
+
+    :param df: The DataFrame to work on
+    :param list_columns: List of columns to plot
+    :param list_names: Liste of names for each feature
+    :param title: Title of the plot
+    :param x_axis: Label to use as x axis
+    :param y_axis: Label to use as y axis
+    """
+    fig = go.Figure()
+    for column, name in zip(list_columns, list_names):
+        fig.add_trace(go.Box(y=df[column], name=name))
+
+    fig.update_layout(
+        title=title,
+        yaxis_title=y_axis,
+        xaxis_title=x_axis
+    )
+
+    fig.show()
+
+### Function to make a bar plot
+def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
+                 title: str, labels: dict = None, color: str = None, mode: str = None) -> None:
+    """
+    Function to make a bar plot of different features from a DataFrame
+
+    :param df: The DataFrame to work on
+    :param feature_name: The feature we want to analyse
+    :param reference: What we study the data against
+    :param title: Title of the plot
+    :param labels: Dictionary of labels to use
+    :param color: Specific column to use as color
+    :param mode: How to display the bars
+    """
+    fig = px.bar(df,
+                 x=feature_name,
+                 y=reference,
+                 color=color,
+                 barmode=mode,
+                 title=title,
+                 labels=labels)
+
     fig.show()
