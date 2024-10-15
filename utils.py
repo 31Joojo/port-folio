@@ -255,6 +255,20 @@ def transform_into_dummies(df: pd.DataFrame, ref_column: str, seperator: str = N
     """
     return df[ref_column].str.get_dummies(seperator=seperator)
 
+### Function to compute percentage
+def percentage(df: pd.DataFrame, new_col_name: str, col1: str, col2: str) -> pd.Series:
+    """
+    Function to calculate a percentage between two columns
+
+    :param df: The DataFrame to work on
+    :param new_col_name: Name of the new column
+    :param col1: First column as numerator
+    :param col2: Second column as denominator
+    :return: A Series with percentage between two columns
+    """
+    df[new_col_name] = (df[col1] / df[col2]) * 100
+    return df[new_col_name]
+
 ### Function to merge two DataFrames
 
 def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on, how: str ='inner', *args, **kwargs):
@@ -453,3 +467,21 @@ def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
                  labels=labels)
 
     fig.show()
+
+### Function to generate a heatmap
+def make_heatmap(df: pd.DataFrame, labels:dict, title: str = None) -> None:
+    """
+    Function to make a heatmap of different features from a DataFrame
+
+    :param df: The DataFrame to work on
+    :param labels: The labels to use
+    :param title: Title of the plot
+    """
+    fig = px.imshow(df.T,
+                    labels=labels,
+                    color_continuous_scale="Viridis",
+                    aspect="auto",
+                    title=title)
+
+    fig.show()
+
