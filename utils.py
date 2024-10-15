@@ -257,7 +257,7 @@ def transform_into_dummies(df: pd.DataFrame, ref_column: str, seperator: str = N
 
 ### Function to merge two DataFrames
 
-def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on=None, how='inner', *args, **kwargs):
+def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on, how: str ='inner', *args, **kwargs):
     """
     Function for merging several DataFrames based on specified columns
 
@@ -291,12 +291,13 @@ def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return df_concatenated
 
 ### Function to make a simple plot
-def simple_plot(df: pd.DataFrame, path_geojson_file: str = None, loc: str = None,
+def simple_plot(df: pd.DataFrame, type: str, path_geojson_file: str = None, loc: str = None,
                 color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> None:
     """
     Function to plot a scatter plot of a DataFrame
 
     :param df: The DataFrame to work on
+    :param type: The type of plot to create (Ex: mapbox or choropleth)
     :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param color: Column to use as color
@@ -305,23 +306,42 @@ def simple_plot(df: pd.DataFrame, path_geojson_file: str = None, loc: str = None
     :param label: Corresponding label for the corresponding data
     :param title: Title of the plot
     """
-    fig = px.choropleth(
-        df,
-        geojson=load_json(path_geojson_file),
-        locations=loc,
-        featureidkey="properties.code",
-        color=color,
-        hover_name=hover_name,
-        hover_data=hover_data,
-        color_continuous_scale="Plasma",
-        labels=label,
-        title=title
-    )
+    if type == 'choropleth':
+        fig = px.choropleth(
+            df,
+            geojson=load_json(path_geojson_file),
+            locations=loc,
+            featureidkey="properties.code",
+            color=color,
+            hover_name=hover_name,
+            hover_data=hover_data,
+            color_continuous_scale="Plasma",
+            labels=label,
+            title=title
+        )
 
-    fig.update_layout(fitbounds="locations", visible=False)
+        fig.update_layout(fitbounds="locations", visible=False)
+        ### Final plot
+        fig.show()
 
-    ### Final plot
-    fig.show()
+    elif type == 'mapbox':
+        fig = px.choropleth_mapbox(
+            df,
+            geojson=load_json(path_geojson_file),
+            locations=loc,
+            featureidkey="properties.code",
+            color=color,
+            hover_name=hover_name,
+            hover_data=hover_data,
+            color_continuous_scale="Reds",
+            mapbox_style="carto-positron",
+            zoom=5,
+            center={"lat": 46.603354, "lon": 1.888334},
+            opacity=0.5
+        )
+        fig.update_layout(mapboxstyle="open-street-map",
+                          title=title,
+                          height=800)
 
 ### Function to make subplots
 def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
