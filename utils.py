@@ -273,7 +273,7 @@ def percentage(df: pd.DataFrame, new_col_name: str, col1: str, col2: str) -> pd.
 
 ### Function to merge two DataFrames
 
-def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on, how: str ='inner', *args, **kwargs):
+def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, on, how: str = 'inner', *args, **kwargs):
     """
     Function for merging several DataFrames based on specified columns
 
@@ -509,12 +509,11 @@ def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
 
 ### Function to display a map with clusters
 
-def disp_clusters(df: pd.DataFrame, info_to_display: list, feature_info: str, popup_pattern: str) -> None:
+def disp_clusters(df: pd.DataFrame, feature_info: str, popup_pattern: str) -> None:
     """
     Function to display the clusters of features from a DataFrame
 
     :param df: The DataFrame to work on
-    :param info_to_display: List of features to display
     :param feature_info: Name of the feature information we want to display
     :param popup_pattern: Pattern that will be applied for displaying information
     """
