@@ -4,6 +4,8 @@ import plotly.express as px
 from matplotlib import pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import folium
+from folium.plugins import MarkerCluster
 
 ### Function to load the data
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
@@ -300,18 +302,38 @@ def concat_dataframes(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     :param df2: Seconde DataFrame to concatenate
     :return: New DataFrame with concatenated DataFrames
     """
-    df_concatenated = pd.concat(df1, df2, axis=1)
+    df_concatenated = pd.concat([df1, df2], axis=1)
 
     return df_concatenated
 
+### Function to fill nan values
+def fill_na(df1: pd.DataFrame, df2: pd.DataFrame, col_to_fill: list, on, suffixes) -> pd.DataFrame:
+    """
+    Function to fill NaN values in a DataFrame
+
+    :param df1: First DataFrame
+    :param df2: Second DataFrame
+    :param col_to_fill: List of columns to fill
+    :param on: Columns to use a reference for merging DataFrame
+    :param suffixes: List of suffixes to use
+    :return: New filled DataFrame
+    """
+    df_filled = df1.merge(df2, on=on, suffixes=suffixes, how='left')
+
+    for col in col_to_fill:
+        df_filled[col] = df_filled[col.fillna(df_filled[f'{col}_median'])]
+
+    df_filled = df_filled.drop([f'{col}_median' for col in col_to_fill], axis=1)
+    return df_filled
+
 ### Function to make a simple plot
-def simple_plot(df: pd.DataFrame, type: str, path_geojson_file: str = None, loc: str = None,
+def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None, loc: str = None,
                 color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> None:
     """
     Function to plot a scatter plot of a DataFrame
 
     :param df: The DataFrame to work on
-    :param type: The type of plot to create (Ex: mapbox or choropleth)
+    :param plot_type: The type of plot to create (Ex: mapbox or choropleth)
     :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param color: Column to use as color
@@ -320,7 +342,7 @@ def simple_plot(df: pd.DataFrame, type: str, path_geojson_file: str = None, loc:
     :param label: Corresponding label for the corresponding data
     :param title: Title of the plot
     """
-    if type == 'choropleth':
+    if plot_type == 'choropleth':
         fig = px.choropleth(
             df,
             geojson=load_json(path_geojson_file),
@@ -338,7 +360,7 @@ def simple_plot(df: pd.DataFrame, type: str, path_geojson_file: str = None, loc:
         ### Final plot
         fig.show()
 
-    elif type == 'mapbox':
+    elif plot_type == 'mapbox':
         fig = px.choropleth_mapbox(
             df,
             geojson=load_json(path_geojson_file),
@@ -469,7 +491,7 @@ def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
     fig.show()
 
 ### Function to generate a heatmap
-def make_heatmap(df: pd.DataFrame, labels:dict, title: str = None) -> None:
+def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
     """
     Function to make a heatmap of different features from a DataFrame
 
@@ -484,4 +506,28 @@ def make_heatmap(df: pd.DataFrame, labels:dict, title: str = None) -> None:
                     title=title)
 
     fig.show()
+
+### Function to display a map with clusters
+
+def disp_clusters(df: pd.DataFrame, info_to_display: list, feature_info: str, popup_pattern: str) -> None:
+    """
+    Function to display the clusters of features from a DataFrame
+
+    :param df: The DataFrame to work on
+    :param info_to_display: List of features to display
+    :param feature_info: Name of the feature information we want to display
+    :param popup_pattern: Pattern that will be applied for displaying information
+    """
+    m = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
+
+    marker_cluster = MarkerCluster().add_to(m)
+
+    for i, row in df.iterrows():
+        folium.Marker(
+            location=row[feature_info].split(','),
+            popup=popup_pattern,
+            icon=folium.Icon(color='red', icon="info-sign")
+        ).add_to(marker_cluster)
+
+    m
 
