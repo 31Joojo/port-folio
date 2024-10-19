@@ -530,3 +530,112 @@ def disp_clusters(df: pd.DataFrame, feature_info: str, popup_pattern: str) -> No
 
     m
 
+### Function to display the corresponding commentary
+def get_commentary(option: str = None) -> str:
+    """
+    Function to get the commentary of a given option
+
+    :param option: Option selected from option selector to be displayed
+    :return: The commentary corresponding to the chosen option
+    """
+    comments = {
+        'Price distribution analysis': """
+        We observe that for all fuel types there is a strong presence of outliers.
+        Our dataset presents missing values due to several factors :
+            - Some stations don't sell certain types of fuel, so fuel prices are not updated. 
+            - Some values are simply missing, so I think they've just not been recorded, or these outlets don't sell these fuels.
+        Next, we'll calculate the median by department, as it's more robust for asymmetrical distributions or those
+        containing extreme values, as in our case. For example, an isolated station with a much higher price could
+        affect the average.
+        """,
+        'Median price analysis': """
+        """,
+        'Gasoline price analysis': """
+        As we can, most of the west departments have a lower price than the rest of France, especially l'Île-de-France.
+        Generally speaking, we can see that prices in France for sp98 are around 1.80€ and 1.85€ : this distribution is
+        fairly uniform throughout the country, except for Paris, which has a median value over 1.90€ per liter.
+        In the case of sp95, the average price range is between 1.70€ and 1.80€ across the country, except in Paris,
+        where the price per liter is around 2.0€.
+        
+        This price difference between Paris and the rest of the country can be due to several factors:
+            - Higher operating costs in Paris: high rents and property taxes, higher salaries
+            - Less competition between stations in Paris: fewer large low-cost stations, supermarket stations are rare.
+            - Delivery and logistics
+            - Demand effect
+        Fuel prices in Paris are higher due to a combination of additional costs (logistics, operations, taxes) and
+        weaker competition. In addition, local policies and the demand effect play a role. In other regions, the
+        presence of supermarket stations and larger supermarkets reduces prices through increased competition.
+        """,
+        'Ethanol price analysis': """"
+        This case is impressive because we see a complete contrast in average prices between e10 and e85 superethanol.
+        E10 ethanol is much more expensive nationwide, with an  average price of 1.70€, compared with 0.83€ for e85.
+        However, in both cases, there is no real significant difference from one region to another: prices are fairly
+        uniform. This may be due to the fact that there aren't as many ethanol-powered vehicles throughout the country
+        as there are for other types of vehicle.
+        """,
+        'Gazole analysis': """
+        As we can see, the price of diesel is around 1.63€ nationwide. For Corsica and Paris, we see higher costs:
+        around 1.75€ for Corsica, and 1.80€ for Paris.
+        """,
+        'GPLc price analysis': """
+        On average, prices in the region are around €1.0. There is no real variation in price from one département to
+        another, except for Corsica, where the average price is around 1.30€.  This difference may be due to the cost
+        of transporting cLPG between France and Corsica: the cost of transport is therefore included in the price per
+        liter of cLPG.
+        """,
+        'MCA analysis': """
+        The vast majority of departments are centered around the origin (values close to 0 on the two main components).
+        This indicates that they share similar characteristics in terms of permanent fuel breaks.
+        Departments 62 and 12 stand out strongly from the others.
+        Department 62 has a relatively distant position at the top of the graph. This could indicate that it has a
+        specific fuel rupture profile, linked to certain types of fuel that are permanently broken. This means that
+        Pas-de-Calais probably has a uniquely affected fuel type.
+        For department 12, it is also very far along the axis of the first component, which suggests that the permanent
+        breaks in this department are very different from the majority of the other departments.
+        Some departments (such as 64, 0, 76, 44) are scattered at different positions. This shows that they share more
+        specific break patterns, but they are not as extreme as departments 62 and 12. They probably have break patterns 
+        that depend on several fuels, but less than the two extreme cases.
+        Remote departments may be affected by specific local factors. This may include geographical or logistical
+        reasons, or different supply behaviour.
+        """,
+        'E85 & E10 shortage': """
+        The map above shows the definitive discontinuation rate for each département for superethanol e85, also compared
+         with e10.
+        Each rate is represented as a function of the total number of stations per department no longer selling these
+        fuels permanently.
+        As we can see, this fuel has a fairly high rate of permanent discontinuation across the board, with rates
+        approaching **60%** for some departments (such as Aveyron, Haute-Loire, etc.).
+        On the other hand, we can see that some départements have low final breakage rates for superethanol e85:
+        Essonne, Vaucluse and Haute-Garonne, for example. These departments are mainly located on the outskirts of major
+         cities, which encourages the presence of all types of vehicles, and therefore a need for this fuel.
+        Compared with superethanol e10, the shortage rate is a little lower: between **10% and 20%**, except for
+        Corsica, of course, because of its geographical location.
+        This information can help carmakers to orientate their market, and find out which type of vehicle will be most
+        interesting for the populations living in these areas.
+        """,
+        'SP95 & SP98 shortage': """
+        In the case of unleaded 95, such a high level of permanent discontinuation can be explained by the gradual
+        cessation of use of this fuel by private consumers. In fact, the higher the octane rating of gasoline, the
+        better combustion is controlled, protecting your engine's performance and longevity. **Unleaded 98 therefore
+        offers better performance and engine protection than unleaded 95**. As a result, fewer and fewer service
+        stations will be offering this type of fuel, which has a higher ultimate breakage rate.
+        """,
+        'Gazole shortage': """
+        As we can see, diesel has a definitive break rate throughout the country. This is perfectly normal, given that 
+        the proportion of French vehicles running on diesel is almost **53%**.
+        """,
+        'Heatmap analysis': """
+        As we can see, among the list of fuels, the one with the most definitive break is GPLc, with rates reaching 80% 
+        for some departments. And, as we saw earlier, the fuel with the lowest rate of permanent rupture is diesel.
+        """,
+        'Gas stations distribution analysis': """
+        As we can see, **95.5%** of service stations are located on roadsides, which is normal in the case of towns and
+        cities, given that most motorists travel in towns and cities: more traffic means more turnover for the station
+        owners. In particular, there are far more needs in town than on the motorways: going to work or shopping, so
+        there are far more service stations in town.
+        Whereas **4.5%** of service stations are located on the edge of France's motorways. That's a total of 453
+        gas stations located along motorways throughout the country. Excluding holiday periods, this means fewer
+        people passing through, and therefore less need.
+        """
+    }
+    return comments.get(option, "No commentary available for this option.")
