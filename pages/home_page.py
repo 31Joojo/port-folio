@@ -1,9 +1,6 @@
 ### Importation des modules
 import streamlit as st
-import pydeck as pdk
-import pandas as pd
-import numpy as np
-import utils as ut
+import base64
 
 def app():
     ### Page title
@@ -32,28 +29,44 @@ def app():
     """, unsafe_allow_html=True)
 
     ### Links to my social networks
+    button_style = """
+        <style>
+            button {
+                background-color: #D4E6B5;
+                width: 100%;
+                border: 2px solid white;
+                border-radius: .25cm;
+                padding: 10px;
+                margin: 10px auto;
+            }
+            
+            button:hover {
+                color: #D4E6B5;
+                background-color: white;
+                border: 2px solid black;
+            }
+        </style>
+    """
+
+    st.markdown(button_style, unsafe_allow_html=True)
+
     st.markdown("""
-    <style>
-        button {
-            background-color: #D4E6B5;
-            width: 100%;
-            border: 2px solid white;
-            border-radius: .25cm;
-            padding: 10px;
-            margin: 10px auto;
-        }
-        
-        button:hover {
-            color: #D4E6B5;
-            background-color: white;
-            border: 2px solid black;
-        }
-    </style>
     <a href="https://www.linkedin.com/in/joris-larmaillard-noiren/">
         <button>Linkedin</button>
     </a>
     <br>
     <a href="https://github.com/31Joojo">
         <button>GitHub</button>
+    </a>
+    """, unsafe_allow_html=True)
+
+    with open("assets/CV_Base2_Joris_LARMAILLARD-NOIREN copie.pdf", "rb") as file:
+        pdf_bytes = file.read()
+        b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+
+    st.markdown(f"""
+    <a href="data:application/octet-stream;base64,{b64_pdf}" 
+       download="CV_Joris_LARMAILLARD.pdf">
+        <button>Download Resume</button>
     </a>
     """, unsafe_allow_html=True)
