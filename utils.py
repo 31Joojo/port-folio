@@ -1,7 +1,6 @@
 import pandas as pd
 import json
 import plotly.express as px
-from matplotlib import pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import folium
@@ -188,19 +187,19 @@ def count_data(df: pd.DataFrame, columns_to_count, sort_type: str) -> pd.Series:
 
 ### Function to group data
 def group_data(df: pd.DataFrame, columns_to_group: list,
-               column_referred: str = None, agg_func: str = 'sum', name: str = None) -> pd.DataFrame:
+               columns_referred=None, agg_func: str = 'sum', name: str = None) -> pd.DataFrame:
     """
     Function to group the data according to specified columns and apply an aggregation function
 
     :param df: The DataFrame to work on
     :param columns_to_group: The columns that will be used to group the data
-    :param column_referred: The column on which to apply the aggregation function
+    :param columns_referred: The column on which to apply the aggregation function
     :param agg_func: The aggregation function to apply ('sum', 'mean', 'count', etc.)
     :param name: The name of the group
     :return: A DataFrame with grouped columns and aggregated results
     """
     ### Perform the groupby operation
-    grouped = df.groupby(columns_to_group)[column_referred]
+    grouped = df.groupby(columns_to_group)[columns_referred]
 
     ### Apply the aggregation function
     if agg_func == 'sum':
@@ -321,14 +320,30 @@ def fill_na(df1: pd.DataFrame, df2: pd.DataFrame, col_to_fill: list, on, suffixe
     df_filled = df1.merge(df2, on=on, suffixes=suffixes, how='left')
 
     for col in col_to_fill:
-        df_filled[col] = df_filled[col.fillna(df_filled[f'{col}_median'])]
+        df_filled[col] = df_filled[col].fillna(df_filled[f'{col}_median'])
 
     df_filled = df_filled.drop([f'{col}_median' for col in col_to_fill], axis=1)
     return df_filled
 
+### Function to create a pie chart
+def make_pie(df: pd.DataFrame, title: str = None) -> go.Figure:
+    """
+    Function to make a pie chart
+
+    :param df: The DataFrame to work on
+    :param title: Title of the pie chart
+    :return: Plot
+    """
+    fig = px.pie(df,
+                 names=df.index,
+                 values=df.values,
+                 title=title)
+
+    return fig
+
 ### Function to make a simple plot
 def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None, loc: str = None,
-                color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> None:
+                color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> go.Figure:
     """
     Function to plot a scatter plot of a DataFrame
 
@@ -340,7 +355,8 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
     :param hover_name: Name to display while hovering
     :param hover_data: Data to display when hovering
     :param label: Corresponding label for the corresponding data
-    :param title: Title of the plot
+    :param title: Plot title
+    :return: Plot
     """
     if plot_type == 'choropleth':
         fig = px.choropleth(
@@ -356,9 +372,9 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
             title=title
         )
 
-        fig.update_layout(fitbounds="locations", visible=False)
+        fig.update_geos(fitbounds="locations", visible=False)
         ### Final plot
-        fig.show()
+        return fig
 
     elif plot_type == 'mapbox':
         fig = px.choropleth_mapbox(
@@ -378,12 +394,13 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
         fig.update_layout(mapboxstyle="open-street-map",
                           title=title,
                           height=800)
+        return fig
 
 ### Function to make subplots
 def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
              loc: str = None, hover_infor: str = None, color1: str = None, color2: str = None,
              label1: dict = None, label2: dict = None, title: str = None
-             ) -> None:
+             ) -> go.Figure:
     """
     Function to display subplots on one plot
 
@@ -397,6 +414,7 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
     :param label1: Label for first subplot
     :param label2: Label for second subplot
     :param title: Title of the final plot
+    :return: Plot
     """
 
     ### Creating a figure with two columns
@@ -407,6 +425,7 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
     ### First column : 1
     fig.add_trace(
         px.choropleth(
+            df,
             geojson=load_json(path_geojson_file),
             locations=loc,
             featureidkey="properties.code",
@@ -439,11 +458,11 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
                       height=800)
 
     ### Displaying the final plot
-    fig.show()
+    return fig
 
 ### Function to make a boxplot
 def make_boxplot(df: pd.DataFrame, list_columns: list, list_names: list,
-                 title: str = None, x_axis: str = None, y_axis: str = None) -> None:
+                 title: str = None, x_axis: str = None, y_axis: str = None) -> go.Figure:
     """
     Function to make a box plot of different features from a DataFrame
 
@@ -464,11 +483,11 @@ def make_boxplot(df: pd.DataFrame, list_columns: list, list_names: list,
         xaxis_title=x_axis
     )
 
-    fig.show()
+    return fig
 
 ### Function to make a bar plot
 def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
-                 title: str, labels: dict = None, color: str = None, mode: str = None) -> None:
+                 title: str, labels: dict = None, color: str = None, mode: str = None) -> go.Figure:
     """
     Function to make a bar plot of different features from a DataFrame
 
@@ -479,6 +498,7 @@ def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
     :param labels: Dictionary of labels to use
     :param color: Specific column to use as color
     :param mode: How to display the bars
+    :return: Plot
     """
     fig = px.bar(df,
                  x=feature_name,
@@ -488,7 +508,7 @@ def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
                  title=title,
                  labels=labels)
 
-    fig.show()
+    return fig
 
 ### Function to generate a heatmap
 def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
@@ -509,26 +529,33 @@ def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
 
 ### Function to display a map with clusters
 
-def disp_clusters(df: pd.DataFrame, feature_info: str, popup_pattern: str) -> None:
+def disp_clusters(df: pd.DataFrame, feature_info: list, location_col: str, popup_pattern: str) -> folium.Map:
     """
     Function to display the clusters of features from a DataFrame
 
     :param df: The DataFrame to work on
     :param feature_info: Name of the feature information we want to display
+    :param location_col: Name of the column that contains geographical information
     :param popup_pattern: Pattern that will be applied for displaying information
+    :return: Map
     """
     m = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
 
     marker_cluster = MarkerCluster().add_to(m)
 
     for i, row in df.iterrows():
+        popup_text = popup_pattern.format(
+            **{col: row[col] for col in feature_info},
+            ville=row['ville']
+        )
+
         folium.Marker(
-            location=row[feature_info].split(','),
-            popup=popup_pattern,
+            location=row[location_col].split(','),
+            popup=popup_text,
             icon=folium.Icon(color='red', icon="info-sign")
         ).add_to(marker_cluster)
 
-    m
+    return m
 
 ### Function to display the corresponding commentary
 def get_commentary(option: str = None) -> str:
@@ -539,49 +566,54 @@ def get_commentary(option: str = None) -> str:
     :return: The commentary corresponding to the chosen option
     """
     comments = {
-        'Price distribution analysis': """
-        We observe that for all fuel types there is a strong presence of outliers.
-        Our dataset presents missing values due to several factors :
-            - Some stations don't sell certain types of fuel, so fuel prices are not updated. 
-            - Some values are simply missing, so I think they've just not been recorded, or these outlets don't sell these fuels.
-        Next, we'll calculate the median by department, as it's more robust for asymmetrical distributions or those
-        containing extreme values, as in our case. For example, an isolated station with a much higher price could
-        affect the average.
-        """,
         'Median price analysis': """
         """,
         'Gasoline price analysis': """
-        As we can, most of the west departments have a lower price than the rest of France, especially l'Île-de-France.
-        Generally speaking, we can see that prices in France for sp98 are around 1.80€ and 1.85€ : this distribution is
-        fairly uniform throughout the country, except for Paris, which has a median value over 1.90€ per liter.
-        In the case of sp95, the average price range is between 1.70€ and 1.80€ across the country, except in Paris,
-        where the price per liter is around 2.0€.
+        <p>
+            As we can, most of the west departments have a lower price than the rest of France, especially l'Île-de-France.
+            Generally speaking, we can see that prices in France for sp98 are around 1.80€ and 1.85€ : this distribution is
+            fairly uniform throughout the country, except for Paris, which has a median value over 1.90€ per liter.
+            In the case of sp95, the average price range is between 1.70€ and 1.80€ across the country, except in Paris,
+            where the price per liter is around 2.0€.
+        </p>
         
-        This price difference between Paris and the rest of the country can be due to several factors:
-            - Higher operating costs in Paris: high rents and property taxes, higher salaries
-            - Less competition between stations in Paris: fewer large low-cost stations, supermarket stations are rare.
-            - Delivery and logistics
-            - Demand effect
-        Fuel prices in Paris are higher due to a combination of additional costs (logistics, operations, taxes) and
-        weaker competition. In addition, local policies and the demand effect play a role. In other regions, the
-        presence of supermarket stations and larger supermarkets reduces prices through increased competition.
+        <p>
+            This price difference between Paris and the rest of the country can be due to several factors :
+        </p>
+        <ul>
+            <li>Higher operating costs in Paris: high rents and property taxes, higher salaries</li>
+            <li>Less competition between stations in Paris: fewer large low-cost stations, supermarket stations are rare.</li>
+            <li>Delivery and logistics</li>
+            <li>Demand effect</li>
+        </ul>
+        <p>
+            Fuel prices in Paris are higher due to a combination of additional costs (logistics, operations, taxes) and
+            weaker competition. In addition, local policies and the demand effect play a role. In other regions, the
+            presence of supermarket stations and larger supermarkets reduces prices through increased competition.
+        </p>
         """,
-        'Ethanol price analysis': """"
-        This case is impressive because we see a complete contrast in average prices between e10 and e85 superethanol.
-        E10 ethanol is much more expensive nationwide, with an  average price of 1.70€, compared with 0.83€ for e85.
-        However, in both cases, there is no real significant difference from one region to another: prices are fairly
-        uniform. This may be due to the fact that there aren't as many ethanol-powered vehicles throughout the country
-        as there are for other types of vehicle.
+        'Ethanol price analysis': """
+        <p>
+            This case is impressive because we see a complete contrast in average prices between e10 and e85 superethanol.
+            E10 ethanol is much more expensive nationwide, with an  average price of 1.70€, compared with 0.83€ for e85.
+            However, in both cases, there is no real significant difference from one region to another: prices are fairly
+            uniform. This may be due to the fact that there aren't as many ethanol-powered vehicles throughout the country
+            as there are for other types of vehicle.
+        </p>
         """,
-        'Gazole analysis': """
-        As we can see, the price of diesel is around 1.63€ nationwide. For Corsica and Paris, we see higher costs:
-        around 1.75€ for Corsica, and 1.80€ for Paris.
+        'Gazole price analysis': """
+        <p>
+            As we can see, the price of diesel is around 1.63€ nationwide. For Corsica and Paris, we see higher costs:
+            around 1.75€ for Corsica, and 1.80€ for Paris.
+        </p>
         """,
         'GPLc price analysis': """
-        On average, prices in the region are around €1.0. There is no real variation in price from one département to
-        another, except for Corsica, where the average price is around 1.30€.  This difference may be due to the cost
-        of transporting cLPG between France and Corsica: the cost of transport is therefore included in the price per
-        liter of cLPG.
+        <p>
+            On average, prices in the region are around €1.0. There is no real variation in price from one département to
+            another, except for Corsica, where the average price is around 1.30€. This difference may be due to the cost
+            of transporting cLPG between France and Corsica: the cost of transport is therefore included in the price per
+            liter of cLPG.
+        </p>
         """,
         'MCA analysis': """
         The vast majority of departments are centered around the origin (values close to 0 on the two main components).
