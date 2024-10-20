@@ -40,7 +40,7 @@ def app():
     music_play_daily = filter_data(music_play_daily, "Year in (2021, 2022, 2023, 2024)")
 
     st.write('Here is the dataframe.')
-    st.dataframe(music_play_daily, height=600)
+    st.dataframe(music_play_daily.head(100), height=600)
 
     ### Analysis of the reasons for stopping reading
     st.subheader('Analysis of the reasons for stopping reading :', divider=True)
