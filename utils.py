@@ -696,19 +696,6 @@ def get_commentary(option: str = None) -> str:
             To sum up, there is a more severe shortage of cLPG in the south-east and west of the country, while the
             north seems relatively better supplied.
         </p>
-        """,
-        'Heatmap analysis': """
-        As we can see, among the list of fuels, the one with the most definitive break is GPLc, with rates reaching 80% 
-        for some departments. And, as we saw earlier, the fuel with the lowest rate of permanent rupture is diesel.
-        """,
-        'Gas stations distribution analysis': """
-        As we can see, **95.5%** of service stations are located on roadsides, which is normal in the case of towns and
-        cities, given that most motorists travel in towns and cities: more traffic means more turnover for the station
-        owners. In particular, there are far more needs in town than on the motorways: going to work or shopping, so
-        there are far more service stations in town.
-        Whereas **4.5%** of service stations are located on the edge of France's motorways. That's a total of 453
-        gas stations located along motorways throughout the country. Excluding holiday periods, this means fewer
-        people passing through, and therefore less need.
         """
     }
     return comments.get(option, "No commentary available for this option.")
