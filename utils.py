@@ -1,10 +1,12 @@
 import pandas as pd
 import json
+import matplotlib.pyplot as plt
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import folium
 from folium.plugins import MarkerCluster
+from prince import MCA
 
 ### Function to load the data
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
@@ -186,7 +188,7 @@ def count_data(df: pd.DataFrame, columns_to_count, sort_type: str) -> pd.Series:
         raise ValueError("Invalid sort_by value. Use 'index' or 'values'.")
 
 ### Function to group data
-def group_data(df: pd.DataFrame, columns_to_group: list,
+def group_data(df: pd.DataFrame, columns_to_group,
                columns_referred=None, agg_func: str = 'sum', name: str = None) -> pd.DataFrame:
     """
     Function to group the data according to specified columns and apply an aggregation function
@@ -199,7 +201,10 @@ def group_data(df: pd.DataFrame, columns_to_group: list,
     :return: A DataFrame with grouped columns and aggregated results
     """
     ### Perform the groupby operation
-    grouped = df.groupby(columns_to_group)[columns_referred]
+    if columns_referred is not None:
+        grouped = df.groupby(columns_to_group)[columns_referred]
+    else:
+        grouped = df.groupby(columns_to_group)
 
     ### Apply the aggregation function
     if agg_func == 'sum':
@@ -245,16 +250,16 @@ def melt_dataframe(df: pd.DataFrame, columns_to_save: list,
     return df_melted
 
 ### Function for transforming values into dummies
-def transform_into_dummies(df: pd.DataFrame, ref_column: str, seperator: str = None) -> pd.DataFrame:
+def transform_into_dummies(df: pd.DataFrame, ref_column: str, sep: str = None) -> pd.DataFrame:
     """
     Function to transform data into dummy variables
 
     :param df: The DataFrame to work on
     :param ref_column: The column on which to apply the aggregation function
-    :param seperator: Separator to use
+    :param sep: Separator to use
     :return: New DataFrame with dummy variables
     """
-    return df[ref_column].str.get_dummies(seperator=seperator)
+    return df[ref_column].str.get_dummies(sep=sep)
 
 ### Function to compute percentage
 def percentage(df: pd.DataFrame, new_col_name: str, col1: str, col2: str) -> pd.Series:
@@ -325,6 +330,40 @@ def fill_na(df1: pd.DataFrame, df2: pd.DataFrame, col_to_fill: list, on, suffixe
     df_filled = df_filled.drop([f'{col}_median' for col in col_to_fill], axis=1)
     return df_filled
 
+### Function to make MCA analysis
+def make_mca(df: pd.DataFrame, index_ref: str) -> plt.Figure:
+    """
+    Function to make MCA analysis
+
+    :param df: The DataFrame to work on
+    :param index_ref: Column to use as the index
+    :return: Plot
+    """
+    if index_ref:
+        df = df.set_index(index_ref)
+
+    mca = MCA(n_components=2)
+    mca = mca.fit(df)
+    mca_results = mca.transform(df)
+
+    fig = px.scatter(mca_results, 0, 1, text=mca_results.index, width=600, height=600)
+
+    fig.update_traces(textposition='top center')
+
+    fig.update_layout(title_text="MCA Analysis",
+                      xaxis=dict(
+                          showgrid=True,
+                          gridwidth=1
+                      ),
+                      yaxis=dict(
+                          showgrid=True,
+                          gridwidth=1
+                      ))
+    fig.update_xaxes(title_text="Component 1")
+    fig.update_yaxes(title_text="Component 2")
+
+    return fig
+
 ### Function to create a pie chart
 def make_pie(df: pd.DataFrame, title: str = None) -> go.Figure:
     """
@@ -343,7 +382,7 @@ def make_pie(df: pd.DataFrame, title: str = None) -> go.Figure:
 
 ### Function to make a simple plot
 def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None, loc: str = None,
-                color: str = None, hover_name: str = None, hover_data: str = None, label: dict = None, title: str = None) -> go.Figure:
+                color: str = None, hover_name: str = None, hover_data=None, label: dict = None, title: str = None) -> go.Figure:
     """
     Function to plot a scatter plot of a DataFrame
 
@@ -391,7 +430,7 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
             center={"lat": 46.603354, "lon": 1.888334},
             opacity=0.5
         )
-        fig.update_layout(mapboxstyle="open-street-map",
+        fig.update_layout(mapbox_style="open-street-map",
                           title=title,
                           height=800)
         return fig
@@ -511,7 +550,7 @@ def make_barplot(df: pd.DataFrame, feature_name: str, reference: str,
     return fig
 
 ### Function to generate a heatmap
-def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
+def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> go.Figure:
     """
     Function to make a heatmap of different features from a DataFrame
 
@@ -525,7 +564,7 @@ def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> None:
                     aspect="auto",
                     title=title)
 
-    fig.show()
+    return fig
 
 ### Function to display a map with clusters
 
@@ -615,46 +654,48 @@ def get_commentary(option: str = None) -> str:
             liter of cLPG.
         </p>
         """,
-        'MCA analysis': """
-        The vast majority of departments are centered around the origin (values close to 0 on the two main components).
-        This indicates that they share similar characteristics in terms of permanent fuel breaks.
-        Departments 62 and 12 stand out strongly from the others.
-        Department 62 has a relatively distant position at the top of the graph. This could indicate that it has a
-        specific fuel rupture profile, linked to certain types of fuel that are permanently broken. This means that
-        Pas-de-Calais probably has a uniquely affected fuel type.
-        For department 12, it is also very far along the axis of the first component, which suggests that the permanent
-        breaks in this department are very different from the majority of the other departments.
-        Some departments (such as 64, 0, 76, 44) are scattered at different positions. This shows that they share more
-        specific break patterns, but they are not as extreme as departments 62 and 12. They probably have break patterns 
-        that depend on several fuels, but less than the two extreme cases.
-        Remote departments may be affected by specific local factors. This may include geographical or logistical
-        reasons, or different supply behaviour.
-        """,
         'E85 & E10 shortage': """
-        The map above shows the definitive discontinuation rate for each département for superethanol e85, also compared
-         with e10.
-        Each rate is represented as a function of the total number of stations per department no longer selling these
-        fuels permanently.
-        As we can see, this fuel has a fairly high rate of permanent discontinuation across the board, with rates
-        approaching **60%** for some departments (such as Aveyron, Haute-Loire, etc.).
-        On the other hand, we can see that some départements have low final breakage rates for superethanol e85:
-        Essonne, Vaucluse and Haute-Garonne, for example. These departments are mainly located on the outskirts of major
-         cities, which encourages the presence of all types of vehicles, and therefore a need for this fuel.
-        Compared with superethanol e10, the shortage rate is a little lower: between **10% and 20%**, except for
-        Corsica, of course, because of its geographical location.
-        This information can help carmakers to orientate their market, and find out which type of vehicle will be most
-        interesting for the populations living in these areas.
+        <p>
+            The map above shows the definitive discontinuation rate for each département for superethanol e85, also compared 
+            with e10.
+            Each rate is represented as a function of the total number of stations per department no longer selling these
+            fuels permanently.
+            As we can see, this fuel has a fairly high rate of permanent discontinuation across the board, with rates
+            approaching **60%** for some departments (such as Aveyron, Haute-Loire, etc.).
+            On the other hand, we can see that some départements have low final breakage rates for superethanol e85:
+            Essonne, Vaucluse and Haute-Garonne, for example. These departments are mainly located on the outskirts of major 
+            cities, which encourages the presence of all types of vehicles, and therefore a need for this fuel.
+            Compared with superethanol e10, the shortage rate is a little lower: between **10% and 20%**, except for
+            Corsica, of course, because of its geographical location.
+            This information can help carmakers to orientate their market, and find out which type of vehicle will be most
+            interesting for the populations living in these areas.
+        </p>
         """,
         'SP95 & SP98 shortage': """
-        In the case of unleaded 95, such a high level of permanent discontinuation can be explained by the gradual
-        cessation of use of this fuel by private consumers. In fact, the higher the octane rating of gasoline, the
-        better combustion is controlled, protecting your engine's performance and longevity. **Unleaded 98 therefore
-        offers better performance and engine protection than unleaded 95**. As a result, fewer and fewer service
-        stations will be offering this type of fuel, which has a higher ultimate breakage rate.
+        <p>
+            In the case of unleaded 95, such a high level of permanent discontinuation can be explained by the gradual
+            cessation of use of this fuel by private consumers. In fact, the higher the octane rating of gasoline, the
+            better combustion is controlled, protecting your engine's performance and longevity. Unleaded 98 therefore
+            offers better performance and engine protection than unleaded 95. As a result, fewer and fewer service
+            stations will be offering this type of fuel, which has a higher ultimate breakage rate.
+        </p>
         """,
         'Gazole shortage': """
-        As we can see, diesel has a definitive break rate throughout the country. This is perfectly normal, given that 
-        the proportion of French vehicles running on diesel is almost **53%**.
+        <p>
+            As we can see, diesel has a definitive break rate throughout the country. This is perfectly normal, given that 
+            the proportion of French vehicles running on diesel is almost **53%**.
+        </p>
+        """,
+        'GPLc shortage': """
+        <p>
+            There is also a marked shortage in several central and western départements: for example, in the Massif
+            Central and around Bordeaux. Departments in the north and east seem less affected overall, with lower
+            shortage rates, indicated by lighter colors (around 30-40%). There is considerable variability between
+            departments. Some are extremely hard hit, while others show a more stable situation. This heterogeneity
+            could be explained by logistical or supply differences.
+            To sum up, there is a more severe shortage of cLPG in the south-east and west of the country, while the
+            north seems relatively better supplied.
+        </p>
         """,
         'Heatmap analysis': """
         As we can see, among the list of fuels, the one with the most definitive break is GPLc, with rates reaching 80% 
