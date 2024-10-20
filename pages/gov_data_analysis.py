@@ -79,7 +79,7 @@ def app():
     fig = make_boxplot(df_price,
                        ['e10_prix', 'e85_prix', 'sp95_prix', 'sp98_prix', 'gazole_prix', 'gplc_prix'],
                        ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLC'],
-                       title='Distribution of prices',
+                       title='Prices distribution',
                        x_axis='Fuels type',
                        y_axis='Prices (€)')
 
@@ -161,37 +161,37 @@ def app():
 
     st.subheader("Data Visualisation", divider=True)
 
-    st.write("**Service station locations**")
+    ###st.write("**Service station locations**")
 
-    st.write("""
-            The map below shows the geographical location of our service stations. Each station is marked with
-            additional information that can be accessed by clicking on the corresponding icons. This interactive map
-            makes it easy to explore the distribution of stations, and provides useful details for each outlet.
-    """)
+    ###st.write("""
+    ###        The map below shows the geographical location of our service stations. Each station is marked with
+    ###        additional information that can be accessed by clicking on the corresponding icons. This interactive map
+    ###        makes it easy to explore the distribution of stations, and provides useful details for each outlet.
+    ###""")
 
-    pattern = """
-        {ville} :
-        \nE10 : {e10_prix} €/L
-        \nE85 : {e85_prix} €/L
-        \nSP95 : {sp95_prix} €/L
-        \nSP98 : {sp98_prix} €/L
-        \nGazole : {gazole_prix} €/L
-        \nGPLc : {gplc_prix} €/L
-    """
+    ###pattern = """
+    ###    {ville} :
+    ###    \nE10 : {e10_prix} €/L
+    ###    \nE85 : {e85_prix} €/L
+    ###    \nSP95 : {sp95_prix} €/L
+    ###    \nSP98 : {sp98_prix} €/L
+    ###    \nGazole : {gazole_prix} €/L
+    ###    \nGPLc : {gplc_prix} €/L
+    ###"""
 
     ### Filling NaN values
-    df_filled = fill_na(df_price, price_per_departement,
-                        ['sp98_prix', 'sp95_prix', 'gazole_prix', 'e10_prix', 'e85_prix', 'gplc_prix'],
-                        ['departement', 'code_departement'],
-                        ('', '_median'))
+    ###df_filled = fill_na(df_price, price_per_departement,
+    ###                    ['sp98_prix', 'sp95_prix', 'gazole_prix', 'e10_prix', 'e85_prix', 'gplc_prix'],
+    ###                    ['departement', 'code_departement'],
+    ###                    ('', '_median'))
 
-    with st.container():
-        m = disp_clusters(df_filled,
-                  ['e10_prix', 'e85_prix', 'gplc_prix', 'sp98_prix', 'sp95_prix', 'gazole_prix'],
-                  'geom',
-                  pattern
-                  )
-        st_folium(m, width=725, height=600)
+    ###with st.container():
+    ###    m = disp_clusters(df_filled,
+    ###              ['e10_prix', 'e85_prix', 'gplc_prix', 'sp98_prix', 'sp95_prix', 'gazole_prix'],
+    ###              'geom',
+    ###              pattern
+    ###              )
+    ###    st_folium(m, width=725, height=600)
 
     st.write("""
                 In the following section, we will analyze the prices of different types of fuel by department. For easier
@@ -259,3 +259,134 @@ def app():
     ### Geographical analysis
     st.subheader('Geographical exploration of fuel shortages', divider=True)
 
+    st.write("""
+            In this section, we look at fuel shortages on a national scale.
+    """)
+
+    ### Data preprocessing
+    df_shortage = select_columns(df, ['code_departement', 'departement', 'carburants_rupture_definitive'])
+
+    dummies = transform_into_dummies(df, 'carburants_rupture_definitive', ';')
+
+    df_shortage_with_dummies = concat_dataframes(df_shortage, dummies)
+
+    shortage_per_departement = group_data(df_shortage_with_dummies, 'code_departement',
+                                          dummies.columns, 'sum')
+
+    st.write("""
+        Below is the dataframe containing the number of sales outlets with a permanent shortage of the fuel in question.
+    """)
+
+    st.dataframe(shortage_per_departement)
+
+    st.write("""
+            In this section, we apply multiple correspondence analysis. This method is particularly useful for
+            exploring and visualizing complex relationships between qualitative variables. It reduces the dimensionality 
+            of the data while retaining the most important information, thus facilitating interpretation.
+    """)
+
+    st.plotly_chart(make_mca(shortage_per_departement, 'code_departement'))
+
+    ### Commentary
+    st.write("""
+            The vast majority of departments are centered around the origin (values close to 0 on the two main
+            components). This indicates that they share similar characteristics in terms of permanent fuel breaks.
+            Departments 62 and 12 stand out strongly from the others.
+            Department 62 has a relatively distant position at the top of the graph. This could indicate that it has a
+            specific fuel rupture profile, linked to certain types of fuel that are permanently broken. This means that
+            Pas-de-Calais probably has a uniquely affected fuel type.
+            For department 12, it is also very far along the axis of the first component, which suggests that the
+            permanent breaks in this department are very different from the majority of the other departments.
+            Some departments (such as 64, 0, 76, 44) are scattered at different positions. This shows that they share
+            more specific break patterns, but they are not as extreme as departments 62 and 12. They probably have
+            break patterns that depend on several fuels, but less than the two extreme cases.
+            Remote departments may be affected by specific local factors. This may include geographical or logistical
+            reasons, or different supply behaviour.
+    """)
+
+    ### Counting gas stations for each department
+    total_gas_stations = group_data(df_shortage_with_dummies, ['departement', 'code_departement'],
+                                    agg_func='size', name='total_gas_stations')
+
+    st.dataframe(total_gas_stations.head(10), height=400)
+
+    merged_df = merge_dataframes(total_gas_stations, shortage_per_departement, ['code_departement'])
+
+    for item in ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc']:
+        percentage(merged_df, f"{item}_shortage_percentage", item, 'total_gas_stations')
+
+    option = st.selectbox(
+        "Choose an analysis to display : ",
+        ('Gasoline shortage', 'Ethanol shortage', 'Gazole shortage', 'GPLc shortage')
+    )
+
+    if option == 'Gasoline shortage':
+        st.plotly_chart(simple_plot(merged_df,
+                                    'mapbox',
+                                    'data/departements.geojson',
+                                    'code_departement',
+                                    'SP95_shortage_percentage',
+                                    'departement',
+                                    {
+                                        "SP95_shortage_percentage": True,
+                                        "SP98_shortage_percentage": True,
+                                        "total_gas_stations": True},
+                                    title="Fuel shortages by department (SP95 & SP98)"))
+        st.markdown(get_commentary('SP95 & SP98 shortage'), unsafe_allow_html=True)
+
+    if option == 'Ethanol shortage':
+        st.plotly_chart(simple_plot(merged_df,
+                                    'mapbox',
+                                    'data/departements.geojson',
+                                    'code_departement',
+                                    'E85_shortage_percentage',
+                                    'departement',
+                                    {
+                                        "E85_shortage_percentage": True,
+                                        "E10_shortage_percentage": True,
+                                        "total_gas_stations": True},
+                                    title="Fuel shortages by department (E85 & E10)"))
+        st.markdown(get_commentary('E85 & E10 shortage'), unsafe_allow_html=True)
+
+    if option == 'Gazole shortage':
+        st.plotly_chart(simple_plot(merged_df,
+                                    'mapbox',
+                                    'data/departements.geojson',
+                                    'code_departement',
+                                    'Gazole_shortage_percentage',
+                                    'departement',
+                                    {
+                                        "Gazole_shortage_percentage": True,
+                                        "total_gas_stations": True},
+                                    title="Fuel shortages by department (Diesel)"))
+        st.markdown(get_commentary('Gazole shortage'), unsafe_allow_html=True)
+
+    if option == 'GPLc shortage':
+        st.plotly_chart(simple_plot(merged_df,
+                                    'mapbox',
+                                    'data/departements.geojson',
+                                    'code_departement',
+                                    'GPLc_shortage_percentage',
+                                    'departement',
+                                    {
+                                        "GPLc_shortage_percentage": True,
+                                        "total_gas_stations": True},
+                                    title="Fuel shortages by department (GPLc)"))
+        st.markdown(get_commentary('GPLc shortage'), unsafe_allow_html=True)
+
+    ### General shortage analysis
+    heatmap_data = select_columns(merged_df,
+                                  ['code_departement', 'E10_shortage_percentage', 'E85_shortage_percentage',
+                                   'GPLc_shortage_percentage', 'Gazole_shortage_percentage',
+                                   'SP95_shortage_percentage', 'SP98_shortage_percentage'])
+
+    heatmap_data.set_index('code_departement', inplace=True)
+
+    st.plotly_chart(make_heatmap(heatmap_data,
+                                 dict(x='Departement Code', y="Fuel Type", color="Shortage (%)"),
+                                 "Fuel Shortage Percentage by Department"))
+
+    st.write("""
+            As we can see, among the list of fuels, the one with the most definitive break is GPLc, with rates reaching 
+            80% for some departments. And, as we saw earlier, the fuel with the lowest rate of permanent rupture is diesel.
+    """)
