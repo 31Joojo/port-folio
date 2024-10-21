@@ -30,7 +30,6 @@ def app():
         revealing trends, preferences and behaviours from a new angle.
         My approach combines analytical rigour and creativity to make the data accessible and aesthetically pleasing.
     </p>
-    [📂 View source code on GitHub](https://github.com/31Joojo/port-folio/blob/main/pages/home_page.py)
     <h4>
         Site structure :
     </h4>
@@ -96,6 +95,10 @@ def app():
             </ul>
         </li>
     """, unsafe_allow_html=True)
+
+    st.markdown("""
+            [📂 View source code on GitHub](https://github.com/31Joojo/port-folio/blob/main/pages/home_page.py)
+    """)
     
     ### Subtitle
     st.subheader("About me 🚀", divider='green')
