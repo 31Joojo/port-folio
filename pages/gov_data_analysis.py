@@ -28,6 +28,10 @@ def app():
     """)
 
     st.markdown("""
+        [📂 View source code on GitHub](https://github.com/31Joojo/port-folio/blob/main/pages/gov_data_analysis.py)
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
         <p>
         We will have the following subsets of data :
         </p>

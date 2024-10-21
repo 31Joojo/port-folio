@@ -16,6 +16,10 @@ def app():
         Using data collected over time, I'll explore my favorite artists, genres and tracks, as well as my listening trends.
         This will help me identify my preferences and better understand how my music consumption is evolving.
     """)
+
+    st.markdown("""
+        [📂 View source code on GitHub](https://github.com/31Joojo/port-folio/blob/main/pages/music_data_analysis.py)
+    """, unsafe_allow_html=True)
     
     ### Data cleaning
     music_play_daily = load_data('data/Apple Music - Play History Daily Tracks copie.csv')
