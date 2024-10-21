@@ -10,13 +10,92 @@ def app():
     st.subheader("Introduction", divider='green')
 
     ### Introduciton text
-    st.write("""
-        I'm currently doing a Master 1 in Data and Artificial Intelligence at EFREI Paris, and I'm passionate about data mining and creating powerful visual insights.
-        The aim of this portfolio is to demonstrate my skills in data visualisation, by highlighting projects where I analyse my own music listening data.
-
-        Through these visualisations, I seek to transform raw information into intuitive and interactive graphics, revealing trends, preferences and behaviours from a new angle.
+    st.markdown("""
+    <p>
+        I'm currently doing a Master 1 in Data and Artificial Intelligence at EFREI Paris, and I'm passionate about data 
+        mining and creating powerful visual insights.
+        The aim of this portfolio is to demonstrate my skills in data visualisation, by highlighting projects where I 
+        analyse my own music listening data, and governmental data.
+    </p>
+    <h4>
+        Technologies and tools used :
+    </h4>
+    <ul>
+        <li>Streamlit for the web application</li>
+        <li>Python (libraries: pandas, matplotlib/plotly, folium, prince).</li>
+        <li>Interactive visualization (maps, graphs).</li>
+    </ul>
+    <p>
+        Through these visualisations, I seek to transform raw information into intuitive and interactive graphics, 
+        revealing trends, preferences and behaviours from a new angle.
         My approach combines analytical rigour and creativity to make the data accessible and aesthetically pleasing.
-        """)
+    </p>
+    [📂 View source code on GitHub](https://github.com/31Joojo/port-folio/blob/main/pages/home_page.py)
+    <h4>
+        Site structure :
+    </h4>
+    <ol style="list-style: number;">
+        <li>Home page :
+            <ul>
+                <li>Introduction to my site and projects.</li>
+                <li>Links to my LinkedIn and GitHub for a quick overview of my background.</li>
+            </ul>
+        </li>
+        <li>Analysis of my personal music data :
+            <ul>
+                <li>This section presents an analysis of my music-listening habits (e.g. favorite genres, most-listened-to artists).</li>
+                <li>The aim is to provide a personalized, interactive visualization of my own music data.</li>
+            </ul>
+        </li>
+        <li>Analysis of government data on fuel prices :
+            <ul>
+                <li>This page explores fuel prices in France using government data in instantaneous flow.</li>
+                <li>The analysis compares prices between regions, fuel types and brands, with dynamic visualizations (graphs, maps).</li>
+            </ul>
+        </li>
+    </ol>
+    <h5>
+        Code structure :
+    </h5>
+    <ul>
+        <li>Parent file :
+            <ul>
+                <li>This file is the gateway to the site, providing access to the various pages via a simple navigation menu.</li>
+                <li>It also manages the logic required to organize the routes and display the content of each page.</li>
+            </ul>
+        </li>
+        <li>Page files :
+            <ul>
+                <li>Three separate files contain the code specific to each page (Home, Music Analysis, Fuel Price Analysis).</li>
+                <li>This separation helps to better organize the code, making the project more modular and easier to maintain.</li>
+            </ul>
+        </li>
+    </ul>
+    <h5>
+        Choice of structure
+    </h5>
+    <p>
+        I opted for this structure to facilitate navigation and guarantee a fluid user experience. Each page has a clear 
+        purpose, and users can quickly access the information they need via the menu.
+    </p>
+    <h4>
+        Reflections and future improvements :
+    </h4>
+    <ul>
+        <li>Project limitations :
+            <ul style="list-style-type: square;">
+                <li>No historical data → Difficult to study price trends.</li>
+                <li>Possible anomalies in local prices → Influence of unmeasured external factors (promotions, input error).</li>
+            </ul>
+        </li>
+        <li>Possible improvements :
+            <ul style="list-style-type: square;">
+                <li>Integration of new data sources (price history, weather data, etc.)</li>
+                <li>Addition of more advanced interactive filters in Streamlit (by region, city).</li>
+                <li>Additional visualizations to aid decision-making.</li>
+            </ul>
+        </li>
+    """, unsafe_allow_html=True)
     
     ### Subtitle
     st.subheader("About me 🚀", divider='green')
@@ -25,7 +104,7 @@ def app():
     st.markdown("""
         <p>Name : Joris LARMAILARD-NOIREN</p>
         <p>Email : joris.larmaillard--noiren@efrei.net</p>
-        <p>Cursus : on master degree Data & AI</p>
+        <p>Cursus : on Master degree Data & AI</p>
     """, unsafe_allow_html=True)
 
     ### Links to my social networks
