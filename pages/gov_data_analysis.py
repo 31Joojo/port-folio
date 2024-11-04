@@ -8,7 +8,7 @@ from streamlit_folium import st_folium
 
 def app():
     ### Page title
-    st.title("Government data analysis")
+    st.title("Price analysis")
 
     ### Subtitle
     st.subheader("Introduction", divider=True)
@@ -165,37 +165,37 @@ def app():
 
     st.subheader("Data Visualisation", divider=True)
 
-    ###st.write("**Service station locations**")
+    ### st.write("**Service station locations**")
 
-    ###st.write("""
-    ###        The map below shows the geographical location of our service stations. Each station is marked with
-    ###        additional information that can be accessed by clicking on the corresponding icons. This interactive map
-    ###        makes it easy to explore the distribution of stations, and provides useful details for each outlet.
-    ###""")
+    ### st.write("""
+    ###         The map below shows the geographical location of our service stations. Each station is marked with
+    ###         additional information that can be accessed by clicking on the corresponding icons. This interactive map
+    ###         makes it easy to explore the distribution of stations, and provides useful details for each outlet.
+    ### """)
 
-    ###pattern = """
-    ###    {ville} :
-    ###    \nE10 : {e10_prix} €/L
-    ###    \nE85 : {e85_prix} €/L
-    ###    \nSP95 : {sp95_prix} €/L
-    ###    \nSP98 : {sp98_prix} €/L
-    ###    \nGazole : {gazole_prix} €/L
-    ###    \nGPLc : {gplc_prix} €/L
-    ###"""
+    ### pattern = """
+    ###     {ville} :
+    ###     \nE10 : {e10_prix} €/L
+    ###     \nE85 : {e85_prix} €/L
+    ###     \nSP95 : {sp95_prix} €/L
+    ###     \nSP98 : {sp98_prix} €/L
+    ###     \nGazole : {gazole_prix} €/L
+    ###     \nGPLc : {gplc_prix} €/L
+    ### """
 
-    ### Filling NaN values
-    ###df_filled = fill_na(df_price, price_per_departement,
-    ###                    ['sp98_prix', 'sp95_prix', 'gazole_prix', 'e10_prix', 'e85_prix', 'gplc_prix'],
-    ###                    ['departement', 'code_departement'],
-    ###                    ('', '_median'))
+    ### ### Filling NaN values
+    ### df_filled = fill_na(df_price, price_per_departement,
+    ###                     ['sp98_prix', 'sp95_prix', 'gazole_prix', 'e10_prix', 'e85_prix', 'gplc_prix'],
+    ###                     ['departement', 'code_departement'],
+    ###                     ('', '_median'))
 
-    ###with st.container():
-    ###    m = disp_clusters(df_filled,
-    ###              ['e10_prix', 'e85_prix', 'gplc_prix', 'sp98_prix', 'sp95_prix', 'gazole_prix'],
-    ###              'geom',
-    ###              pattern
-    ###              )
-    ###    st_folium(m, width=725, height=600)
+    ### with st.container():
+    ###     m = disp_clusters(df_filled,
+    ###                       ['e10_prix', 'e85_prix', 'gplc_prix', 'sp98_prix', 'sp95_prix', 'gazole_prix'],
+    ###                       'geom',
+    ###                       pattern
+    ###                       )
+    ###     st_folium(m, width=700, height=600)
 
     st.write("""
                 In the following section, we will analyze the prices of different types of fuel by department. For easier
@@ -212,7 +212,6 @@ def app():
 
     if option == 'Gasoline':
         st.plotly_chart(subplots(price_per_departement,
-                                 'data/departements.geojson',
                                  ("SP98 Price by Department", "SP95 Price by Department"),
                                  'code_departement',
                                  'departement',
@@ -225,7 +224,6 @@ def app():
 
     if option == 'Ethanol':
         st.plotly_chart(subplots(price_per_departement,
-                                 'data/departements.geojson',
                                  ("E10 Price by Department", "E85 Price by Department"),
                                  'code_departement',
                                  'departement',
@@ -239,7 +237,6 @@ def app():
     if option == 'Gazole':
         st.plotly_chart(simple_plot(price_per_departement,
                                     'choropleth',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'gazole_prix',
                                     'departement',
@@ -251,7 +248,6 @@ def app():
     if option == 'GPLc':
         st.plotly_chart(simple_plot(price_per_departement,
                                     'choropleth',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'gplc_prix',
                                     'departement',
@@ -312,8 +308,7 @@ def app():
     total_gas_stations = group_data(df_shortage_with_dummies, ['departement', 'code_departement'],
                                     agg_func='size', name='total_gas_stations')
 
-    st.dataframe(total_gas_stations.head(10), height=400)
-
+    st.dataframe(total_gas_stations, height=400)
     merged_df = merge_dataframes(total_gas_stations, shortage_per_departement, ['code_departement'])
 
     for item in ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc']:
@@ -327,7 +322,6 @@ def app():
     if option == 'Gasoline shortage':
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'SP95_shortage_percentage',
                                     'departement',
@@ -341,7 +335,6 @@ def app():
     if option == 'Ethanol shortage':
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'E85_shortage_percentage',
                                     'departement',
@@ -355,7 +348,6 @@ def app():
     if option == 'Gazole shortage':
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'Gazole_shortage_percentage',
                                     'departement',
@@ -368,7 +360,6 @@ def app():
     if option == 'GPLc shortage':
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
-                                    'data/departements.geojson',
                                     'code_departement',
                                     'GPLc_shortage_percentage',
                                     'departement',
