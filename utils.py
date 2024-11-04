@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import folium
 from folium.plugins import MarkerCluster
 from prince import MCA
+import streamlit as st
 
 ### Function to load the data
 def load_data(filepath: str, delimiter: str = None) -> pd.DataFrame:
@@ -28,7 +29,11 @@ def load_json(jsonfile: str) -> dict:
     :return: Json data loaded from the json file
     """
     with open(jsonfile, 'r') as f:
-        return json.load(f)
+        geojson_data = json.load(f)
+    return geojson_data
+
+
+france_departement = load_json('data/departements.geojson')
 
 ### Function to select columns from a DataFrame
 def select_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
@@ -381,14 +386,13 @@ def make_pie(df: pd.DataFrame, title: str = None) -> go.Figure:
     return fig
 
 ### Function to make a simple plot
-def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None, loc: str = None,
+def simple_plot(df: pd.DataFrame, plot_type: str, loc: str = None,
                 color: str = None, hover_name: str = None, hover_data=None, label: dict = None, title: str = None) -> go.Figure:
     """
     Function to plot a scatter plot of a DataFrame
 
     :param df: The DataFrame to work on
     :param plot_type: The type of plot to create (Ex: mapbox or choropleth)
-    :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param color: Column to use as color
     :param hover_name: Name to display while hovering
@@ -400,7 +404,7 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
     if plot_type == 'choropleth':
         fig = px.choropleth(
             df,
-            geojson=load_json(path_geojson_file),
+            geojson=france_departement,
             locations=loc,
             featureidkey="properties.code",
             color=color,
@@ -418,7 +422,7 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
     elif plot_type == 'mapbox':
         fig = px.choropleth_mapbox(
             df,
-            geojson=load_json(path_geojson_file),
+            geojson=france_departement,
             locations=loc,
             featureidkey="properties.code",
             color=color,
@@ -436,7 +440,7 @@ def simple_plot(df: pd.DataFrame, plot_type: str, path_geojson_file: str = None,
         return fig
 
 ### Function to make subplots
-def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
+def subplots(df: pd.DataFrame, subtitles: tuple = None,
              loc: str = None, hover_infor: str = None, color1: str = None, color2: str = None,
              label1: dict = None, label2: dict = None, title: str = None
              ) -> go.Figure:
@@ -445,7 +449,6 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
 
     :param df: The DataFrame to work on
     :param subtitles: Tuples of the two subtitles to display on the subplots
-    :param path_geojson_file: Geojson from which location data are loaded
     :param loc: Column to use as location
     :param hover_infor: Column to use as hover information
     :param color1: First color
@@ -465,7 +468,7 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
     fig.add_trace(
         px.choropleth(
             df,
-            geojson=load_json(path_geojson_file),
+            geojson=france_departement,
             locations=loc,
             featureidkey="properties.code",
             color=color1,
@@ -480,7 +483,7 @@ def subplots(df: pd.DataFrame, path_geojson_file: str, subtitles: tuple = None,
     fig.add_trace(
         px.choropleth(
             df,
-            geojson=load_json(path_geojson_file),
+            geojson=france_departement,
             locations=loc,
             featureidkey="properties.code",
             color=color2,
@@ -568,6 +571,7 @@ def make_heatmap(df: pd.DataFrame, labels: dict, title: str = None) -> go.Figure
 
 ### Function to display a map with clusters
 
+@st.cache_resource
 def disp_clusters(df: pd.DataFrame, feature_info: list, location_col: str, popup_pattern: str) -> folium.Map:
     """
     Function to display the clusters of features from a DataFrame
@@ -578,7 +582,7 @@ def disp_clusters(df: pd.DataFrame, feature_info: list, location_col: str, popup
     :param popup_pattern: Pattern that will be applied for displaying information
     :return: Map
     """
-    m = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
+    m = folium.Map(location=[46.603354, 1.888334], zoom_start=6, height=500)
 
     marker_cluster = MarkerCluster().add_to(m)
 
