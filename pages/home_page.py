@@ -10,14 +10,15 @@ def app():
     st.subheader("About me 🚀", divider='green')
 
     ### General information
+
+    st.image('assets/images/IMG_0350.JPG', width=150)
     st.markdown("""
             <style>
-            .img-circle {
+            img {
                 border-radius: 50%;
                 width: 200px;
             }
             </style>
-            <img src="Users/Jorislarmaillard/Downloads/IMG_6376.JPG" class="img-circle"/>
             <p>Joris LARMAILARD-NOIREN</p>
             <p>Email : joris.larmaillard--noiren@efrei.net</p>
             <p>Cursus : on Master degree Data & AI</p>
