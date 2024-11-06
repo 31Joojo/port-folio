@@ -1,6 +1,5 @@
 ### Importation des modules
 import streamlit as st
-import pydeck as pdk
 import pandas as pd
 import numpy as np
 from utils import *
@@ -79,6 +78,8 @@ def app():
     df_price = select_columns(df, ['cp', 'ville', 'latitude', 'longitude', 'departement', 'code_departement',
                                    'geom', 'prix', 'e10_prix', 'e85_prix', 'sp95_prix', 'sp98_prix', 'gazole_prix',
                                    'gplc_prix'])
+
+    df_price.columns = df_price.columns.str.lower()
 
     fig = make_boxplot(df_price,
                        ['e10_prix', 'e85_prix', 'sp95_prix', 'sp98_prix', 'gazole_prix', 'gplc_prix'],
@@ -314,6 +315,8 @@ def app():
     for item in ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc']:
         percentage(merged_df, f"{item}_shortage_percentage", item, 'total_outlets')
 
+    merged_df.columns = merged_df.columns.str.lower()
+
     option = st.selectbox(
         "Choose an analysis to display : ",
         ('Gasoline shortage', 'Ethanol shortage', 'Gazole shortage', 'GPLc shortage')
@@ -323,11 +326,11 @@ def app():
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
                                     'code_departement',
-                                    'SP95_shortage_percentage',
+                                    'sp95_shortage_percentage',
                                     'departement',
                                     {
-                                        "SP95_shortage_percentage": True,
-                                        "SP98_shortage_percentage": True,
+                                        "sp95_shortage_percentage": True,
+                                        "sp98_shortage_percentage": True,
                                         "total_outlets": True},
                                     title="Fuel shortages by department (SP95 & SP98)"))
         st.markdown(get_commentary('SP95 & SP98 shortage'), unsafe_allow_html=True)
@@ -336,11 +339,11 @@ def app():
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
                                     'code_departement',
-                                    'E85_shortage_percentage',
+                                    'e85_shortage_percentage',
                                     'departement',
                                     {
-                                        "E85_shortage_percentage": True,
-                                        "E10_shortage_percentage": True,
+                                        "e85_shortage_percentage": True,
+                                        "e10_shortage_percentage": True,
                                         "total_outlets": True},
                                     title="Fuel shortages by department (E85 & E10)"))
         st.markdown(get_commentary('E85 & E10 shortage'), unsafe_allow_html=True)
@@ -349,10 +352,10 @@ def app():
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
                                     'code_departement',
-                                    'Gazole_shortage_percentage',
+                                    'gazole_shortage_percentage',
                                     'departement',
                                     {
-                                        "Gazole_shortage_percentage": True,
+                                        "gazole_shortage_percentage": True,
                                         "total_outlets": True},
                                     title="Fuel shortages by department (Diesel)"))
         st.markdown(get_commentary('Gazole shortage'), unsafe_allow_html=True)
@@ -361,19 +364,19 @@ def app():
         st.plotly_chart(simple_plot(merged_df,
                                     'mapbox',
                                     'code_departement',
-                                    'GPLc_shortage_percentage',
+                                    'gplc_shortage_percentage',
                                     'departement',
                                     {
-                                        "GPLc_shortage_percentage": True,
+                                        "gplc_shortage_percentage": True,
                                         "total_outlets": True},
                                     title="Fuel shortages by department (GPLc)"))
         st.markdown(get_commentary('GPLc shortage'), unsafe_allow_html=True)
 
     ### General shortage analysis
     heatmap_data = select_columns(merged_df,
-                                  ['code_departement', 'E10_shortage_percentage', 'E85_shortage_percentage',
-                                   'GPLc_shortage_percentage', 'Gazole_shortage_percentage',
-                                   'SP95_shortage_percentage', 'SP98_shortage_percentage'])
+                                  ['code_departement', 'e10_shortage_percentage', 'e85_shortage_percentage',
+                                   'gplc_shortage_percentage', 'gazole_shortage_percentage',
+                                   'sp95_shortage_percentage', 'sp98_shortage_percentage'])
 
     heatmap_data.set_index('code_departement', inplace=True)
 
@@ -395,20 +398,33 @@ def app():
     """)
 
     list_of_departement = select_columns(price_per_departement_melted, 'departement').unique().tolist()
+    list_of_fuel = ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc']
+
+    if 'option_dept' not in st.session_state:
+        st.session_state.option_dept = list_of_departement[0]
+    if 'option_fuel' not in st.session_state:
+        st.session_state.option_fuel = list_of_fuel[0]
 
     with st.container():
         col1, col2 = st.columns(2)
         with col1:
-            option_dept = st.selectbox(
+            st.session_state.option_dept = st.selectbox(
                 "Choose a departement : ",
-                list_of_departement
+                list_of_departement,
+                index=list_of_departement.index(st.session_state.option_dept)
             )
 
         with col2:
-            option_fuel = st.selectbox(
+            st.session_state.option_fuel = st.selectbox(
                 "Choose a fuel : ",
-                ('E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc')
+                list_of_fuel,
+                index=list_of_fuel.index(st.session_state.option_fuel)
             )
     if st.button('Go !'):
-        res = disp_data(price_per_departement, merged_df, option_dept, option_fuel)
+        res = disp_data(price_per_departement, merged_df, st.session_state.option_dept, st.session_state.option_fuel)
         st.markdown(res, unsafe_allow_html=True)
+
+    if st.button('Reset'):
+        st.session_state.option_dept = list_of_departement[0]
+        st.session_state.option_fuel = list_of_fuel[0]
+        st.query_params.clear()

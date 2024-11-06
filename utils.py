@@ -36,7 +36,7 @@ def load_json(jsonfile: str) -> dict:
 france_departement = load_json('data/departements.geojson')
 
 ### Function to select columns from a DataFrame
-def select_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+def select_columns(df: pd.DataFrame, columns) -> pd.DataFrame:
     """
     Selects columns from a dataframe
 
@@ -716,9 +716,9 @@ def disp_data(df_p: pd.DataFrame, df_s: pd.DataFrame, option_d: str, option_f: s
     :return:
     """
     dept_price = df_p.loc[df_p['departement'] == option_d][f"{option_f.lower()}_prix"].item()
-    fuel_shortage = df_s.loc[df_s['departement'] == option_d][option_f.upper()].item()
+    fuel_shortage = df_s.loc[df_s['departement'] == option_d][option_f.lower()].item()
     total_outlets = df_s.loc[df_s['departement'] == option_d]['total_outlets'].item()
-    fuel_percentage = round(df_s.loc[df_s['departement'] == option_d][f"{option_f.upper()}_shortage_percentage"].item(), 2)
+    fuel_percentage = round(df_s.loc[df_s['departement'] == option_d][f"{option_f.lower()}_shortage_percentage"].item(), 2)
 
     result = f"""
         <p>
@@ -733,4 +733,3 @@ def disp_data(df_p: pd.DataFrame, df_s: pd.DataFrame, option_d: str, option_f: s
     """
 
     return result
-
