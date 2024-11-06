@@ -703,3 +703,34 @@ def get_commentary(option: str = None) -> str:
         """
     }
     return comments.get(option, "No commentary available for this option.")
+
+### Function to display information about a given department
+def disp_data(df_p: pd.DataFrame, df_s: pd.DataFrame, option_d: str, option_f: str) -> str:
+    """
+    Function to display information about a particular department
+
+    :param df_p: Dataframe that contains department price information
+    :param df_s: Dataframe that contains shortage information about a particular fuel type
+    :param option_d: Department name
+    :param option_f: Fuel type
+    :return:
+    """
+    dept_price = df_p.loc[df_p['departement'] == option_d][f"{option_f.lower()}_prix"].item()
+    fuel_shortage = df_s.loc[df_s['departement'] == option_d][option_f.upper()].item()
+    total_outlets = df_s.loc[df_s['departement'] == option_d]['total_outlets'].item()
+    fuel_percentage = round(df_s.loc[df_s['departement'] == option_d][f"{option_f.upper()}_shortage_percentage"].item(), 2)
+
+    result = f"""
+        <p>
+            Here is the relevant information :
+            <ul>
+                <li>&#128178; Department price : {dept_price}</li>
+                <li>&#9981; Number of outlets without this fuel : {fuel_shortage}</li>
+                <li>&#9981;Total number of outlets in this department : {total_outlets}</li>
+                <li>&#128689; Percentage shortage of this fuel : {fuel_percentage}</li>
+            </ul>
+        </p>
+    """
+
+    return result
+

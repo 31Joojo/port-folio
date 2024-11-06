@@ -306,13 +306,13 @@ def app():
 
     ### Counting gas stations for each department
     total_gas_stations = group_data(df_shortage_with_dummies, ['departement', 'code_departement'],
-                                    agg_func='size', name='total_gas_stations')
+                                    agg_func='size', name='total_outlets')
 
     st.dataframe(total_gas_stations, height=400)
     merged_df = merge_dataframes(total_gas_stations, shortage_per_departement, ['code_departement'])
 
     for item in ['E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc']:
-        percentage(merged_df, f"{item}_shortage_percentage", item, 'total_gas_stations')
+        percentage(merged_df, f"{item}_shortage_percentage", item, 'total_outlets')
 
     option = st.selectbox(
         "Choose an analysis to display : ",
@@ -328,7 +328,7 @@ def app():
                                     {
                                         "SP95_shortage_percentage": True,
                                         "SP98_shortage_percentage": True,
-                                        "total_gas_stations": True},
+                                        "total_outlets": True},
                                     title="Fuel shortages by department (SP95 & SP98)"))
         st.markdown(get_commentary('SP95 & SP98 shortage'), unsafe_allow_html=True)
 
@@ -341,7 +341,7 @@ def app():
                                     {
                                         "E85_shortage_percentage": True,
                                         "E10_shortage_percentage": True,
-                                        "total_gas_stations": True},
+                                        "total_outlets": True},
                                     title="Fuel shortages by department (E85 & E10)"))
         st.markdown(get_commentary('E85 & E10 shortage'), unsafe_allow_html=True)
 
@@ -353,7 +353,7 @@ def app():
                                     'departement',
                                     {
                                         "Gazole_shortage_percentage": True,
-                                        "total_gas_stations": True},
+                                        "total_outlets": True},
                                     title="Fuel shortages by department (Diesel)"))
         st.markdown(get_commentary('Gazole shortage'), unsafe_allow_html=True)
 
@@ -365,7 +365,7 @@ def app():
                                     'departement',
                                     {
                                         "GPLc_shortage_percentage": True,
-                                        "total_gas_stations": True},
+                                        "total_outlets": True},
                                     title="Fuel shortages by department (GPLc)"))
         st.markdown(get_commentary('GPLc shortage'), unsafe_allow_html=True)
 
@@ -385,3 +385,30 @@ def app():
             As we can see, among the list of fuels, the one with the most definitive break is GPLc, with rates reaching 
             80% for some departments. And, as we saw earlier, the fuel with the lowest rate of permanent rupture is diesel.
     """)
+
+    st.subheader('Free checking', divider=True)
+
+    st.write("""
+        In the following section of this site, you can use the available selectors to display information related to the 
+        selected department and the chosen fuel type. This allows you to easily access specific data tailored to your 
+        preferences
+    """)
+
+    list_of_departement = select_columns(price_per_departement_melted, 'departement').unique().tolist()
+
+    with st.container():
+        col1, col2 = st.columns(2)
+        with col1:
+            option_dept = st.selectbox(
+                "Choose a departement : ",
+                list_of_departement
+            )
+
+        with col2:
+            option_fuel = st.selectbox(
+                "Choose a fuel : ",
+                ('E10', 'E85', 'SP95', 'SP98', 'Gazole', 'GPLc')
+            )
+    if st.button('Go !'):
+        res = disp_data(price_per_departement, merged_df, option_dept, option_fuel)
+        st.markdown(res, unsafe_allow_html=True)
