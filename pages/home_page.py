@@ -99,7 +99,7 @@ def app():
         </a>
         """, unsafe_allow_html=True)
 
-    with open("assets/CV_Base2_Joris_LARMAILLARD-NOIREN copie.pdf", "rb") as file:
+    with open("assets/CV_Simple_Joris_LARMAILLARD-NOIREN copie.pdf", "rb") as file:
         pdf_bytes = file.read()
         b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
 
